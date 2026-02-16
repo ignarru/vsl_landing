@@ -31,7 +31,7 @@ export default function Home() {
           {/* Headline */}
           <h1 className="text-[1.75rem] leading-[1.2] sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold tracking-tight mb-3 sm:mb-3 max-w-5xl w-full">
             Vende <span className="text-blue3">+30%</span> con
-            un sistema automático que deja las ventas servidas para tus
+            un sistema automático que deja las <span className="text-blue3">ventas servidas</span> para tus
             empleados
           </h1>
 
