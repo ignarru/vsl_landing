@@ -2,10 +2,12 @@
 
 import { useRef, useState, useCallback } from "react";
 
+const R2_BASE = "https://pub-fd739a0187554bf49a5a791d47659975.r2.dev";
+
 const RESOLUTIONS = [
-  { label: "1080p", src: "/vsl_landing-1080p.mp4" },
-  { label: "720p", src: "/vsl_landing-720p.mp4" },
-  { label: "480p", src: "/vsl_landing-480p.mp4" },
+  { label: "1080p", src: `${R2_BASE}/vsl_landing-1080p.mp4` },
+  { label: "720p", src: `${R2_BASE}/vsl_landing-720p.mp4` },
+  { label: "480p", src: `${R2_BASE}/vsl_landing-480p.mp4` },
 ];
 
 export default function VideoPlayer() {
