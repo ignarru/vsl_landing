@@ -10,9 +10,14 @@ const RESOLUTIONS = [
   { label: "480p", src: `${R2_BASE}/vsl_landing-480p.mp4` },
 ];
 
+function getDefaultResolution() {
+  if (typeof window === "undefined") return 0;
+  return window.innerWidth < 768 ? 2 : 0; // 480p on mobile, 1080p on desktop
+}
+
 export default function VideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(getDefaultResolution);
   const [open, setOpen] = useState(false);
 
   const switchResolution = useCallback(
@@ -48,7 +53,7 @@ export default function VideoPlayer() {
         autoPlay
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         disablePictureInPicture
         controlsList="noplaybackrate nodownload"
         src={RESOLUTIONS[current].src}

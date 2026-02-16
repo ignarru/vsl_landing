@@ -7,8 +7,14 @@ export default function CalEmbed() {
 
   // Start loading the iframe after first paint (not blocking render)
   useEffect(() => {
-    const id = requestIdleCallback(() => setLoaded(true));
-    return () => cancelIdleCallback(id);
+    if (typeof requestIdleCallback === "function") {
+      const id = requestIdleCallback(() => setLoaded(true));
+      return () => cancelIdleCallback(id);
+    } else {
+      // Safari/iOS doesn't support requestIdleCallback
+      const id = setTimeout(() => setLoaded(true), 100);
+      return () => clearTimeout(id);
+    }
   }, []);
 
   return (
