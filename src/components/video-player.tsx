@@ -52,7 +52,7 @@ export default function VideoPlayer() {
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video
         ref={videoRef}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
         controls
         autoPlay
         muted

@@ -17,42 +17,42 @@ export default function Home() {
       {/* ── BANNER DE CALIFICACION ── */}
       <div className="bg-alert/15 border-b-2 border-alert/30">
         <div className="py-3 px-4 sm:py-4 sm:px-6 text-center">
-          <p className="text-sm sm:text-base font-bold text-alert tracking-wide">
+          <p className="text-base sm:text-lg font-bold text-alert tracking-wide">
             SOLO PARA TIENDAS MAYORISTAS CON UN ALTO VOLUMEN DE MENSAJES POR DÍA
           </p>
         </div>
       </div>
 
       {/* ── HERO VSL ── */}
-      <section className="relative flex flex-col h-[calc(100dvh-3rem)] px-4 sm:px-8 lg:px-12 py-4 sm:py-6 overflow-hidden">
+      <section className="relative px-4 sm:px-8 lg:px-12 py-6 sm:py-8 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-blue/8 rounded-full blur-[160px] pointer-events-none" />
 
-        <div className="relative w-full max-w-7xl mx-auto text-center flex flex-col items-center flex-1 min-h-0">
+        <div className="relative w-full max-w-7xl mx-auto text-center flex flex-col items-center">
           {/* Headline */}
-          <h1 className="text-lg sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold tracking-tight leading-[1.15] mb-1.5 sm:mb-2 max-w-5xl w-full">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold tracking-tight leading-[1.15] mb-2 sm:mb-3 max-w-5xl w-full">
             Vende <span className="text-blue3">+30%</span> con
             un sistema automático que deja las ventas servidas para tus
             empleados
           </h1>
 
-          <p className="text-blue3 text-xs sm:text-sm italic mb-3 sm:mb-4">
+          <p className="text-blue3 text-sm sm:text-base italic mb-4 sm:mb-5">
             *Sin contratar más personal. Sin invertir más en publicidad.
           </p>
 
-          {/* ── VSL Video (fills remaining space) ── */}
-          <div className="vsl-frame w-full max-w-6xl flex-1 min-h-0 mb-3 sm:mb-4">
+          {/* ── VSL Video (maintains aspect ratio) ── */}
+          <div className="vsl-frame w-full max-w-6xl mb-4 sm:mb-6 aspect-video">
             <VideoPlayer />
           </div>
 
           {/* CTA below video */}
-          <div className="shrink-0 pb-1">
+          <div className="pb-1">
             <a
               href="#agendar"
-              className="cta-pulse inline-flex items-center gap-2 bg-blue hover:bg-blue2 text-white font-semibold px-6 py-2.5 sm:px-8 sm:py-3.5 rounded-xl text-sm sm:text-base transition-all hover:-translate-y-0.5"
+              className="cta-pulse inline-flex items-center gap-2 bg-blue hover:bg-blue2 text-white font-semibold px-6 py-3 sm:px-8 sm:py-3.5 rounded-xl text-base sm:text-lg transition-all hover:-translate-y-0.5"
             >
               Agendar llamada de 15 min
             </a>
-            <p className="text-ink3 text-xs mt-1.5 sm:mt-2">
+            <p className="text-ink3 text-sm mt-2 sm:mt-3">
               Gratis · Sin compromiso · Te mostramos cómo aplicaría en tu caso
             </p>
           </div>
@@ -76,7 +76,7 @@ export default function Home() {
                 <p className="text-2xl sm:text-3xl font-extrabold text-blue3 tracking-tight mb-1">
                   {s.val}
                 </p>
-                <p className="text-ink3 text-xs sm:text-sm">{s.label}</p>
+                <p className="text-ink3 text-sm sm:text-base">{s.label}</p>
               </div>
             ))}
           </div>
@@ -86,12 +86,12 @@ export default function Home() {
       {/* ── ANTES vs DESPUES ── */}
       <section className="py-16 sm:py-20 px-4 sm:px-8 lg:px-12 border-t border-border">
         <div className="w-full max-w-7xl mx-auto">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-center mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-center mb-4">
             De perder clientes a cerrar ventas
             <br className="hidden sm:block" />
             <span className="text-blue3"> mientras dormís</span>
           </h2>
-          <p className="text-ink2 text-sm sm:text-base text-center max-w-xl mx-auto mb-10 sm:mb-12">
+          <p className="text-ink2 text-base sm:text-lg text-center max-w-xl mx-auto mb-10 sm:mb-12">
             Negocios como el tuyo ya dejaron de depender de horarios y personas
             para vender.
           </p>
@@ -113,7 +113,7 @@ export default function Home() {
                     <span className="text-alert2/60 text-sm mt-0.5 shrink-0">
                       ✕
                     </span>
-                    <p className="text-ink2 text-sm sm:text-[0.95rem] leading-relaxed">
+                    <p className="text-ink2 text-base sm:text-[1.05rem] leading-relaxed">
                       {t}
                     </p>
                   </div>
@@ -137,7 +137,7 @@ export default function Home() {
                     <span className="text-blue3 text-sm mt-0.5 shrink-0">
                       ✓
                     </span>
-                    <p className="text-ink2 text-sm sm:text-[0.95rem] leading-relaxed">
+                    <p className="text-ink2 text-base sm:text-[1.05rem] leading-relaxed">
                       {t}
                     </p>
                   </div>
@@ -178,7 +178,7 @@ export default function Home() {
             >
               <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
             </svg>
-            <blockquote className="text-base sm:text-lg lg:text-xl text-ink leading-relaxed mb-6">
+            <blockquote className="text-lg sm:text-xl lg:text-2xl text-ink leading-relaxed mb-6">
               &ldquo;Pasamos de responder 200 mensajes a mano por día a que el
               bot maneje el <span className="text-blue3 font-semibold">90%</span>{" "}
               solo. Nuestras ventas subieron un{" "}
@@ -214,12 +214,12 @@ export default function Home() {
       {/* ── QUE PASA EN LA LLAMADA ── */}
       <section className="py-16 sm:py-20 px-4 sm:px-8 lg:px-12 border-t border-border">
         <div className="w-full max-w-7xl mx-auto text-center">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight mb-4">
             En 15 minutos vas a saber{" "}
             <span className="text-blue3">exactamente</span> cuánto podés
             automatizar
           </h2>
-          <p className="text-ink2 text-sm sm:text-base max-w-xl mx-auto mb-10 sm:mb-12">
+          <p className="text-ink2 text-base sm:text-lg max-w-xl mx-auto mb-10 sm:mb-12">
             No es una charla de ventas. Es un diagnóstico rápido donde te
             mostramos qué se puede automatizar y qué impacto tendría.
           </p>
@@ -249,8 +249,8 @@ export default function Home() {
                 <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-blue/10 text-blue3 text-xs font-bold mb-4">
                   {s.step}
                 </span>
-                <h3 className="text-base font-bold mb-2">{s.title}</h3>
-                <p className="text-ink2 text-sm leading-relaxed">{s.text}</p>
+                <h3 className="text-lg font-bold mb-2">{s.title}</h3>
+                <p className="text-ink2 text-base leading-relaxed">{s.text}</p>
               </div>
             ))}
           </div>
@@ -267,7 +267,7 @@ export default function Home() {
       {/* ── FAQ ── */}
       <section className="py-16 sm:py-20 px-4 sm:px-8 lg:px-12 border-t border-border">
         <div className="w-full max-w-7xl mx-auto">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-center mb-8 sm:mb-10">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-center mb-8 sm:mb-10">
             Preguntas frecuentes
           </h2>
 
@@ -298,13 +298,13 @@ export default function Home() {
                 key={f.q}
                 className="group bg-surface border border-border rounded-xl"
               >
-                <summary className="flex items-center justify-between cursor-pointer p-4 sm:p-5 text-ink font-semibold text-sm sm:text-[0.95rem] list-none [&::-webkit-details-marker]:hidden">
+                <summary className="flex items-center justify-between cursor-pointer p-4 sm:p-5 text-ink font-semibold text-base sm:text-lg list-none [&::-webkit-details-marker]:hidden">
                   {f.q}
                   <span className="text-ink3 transition-transform group-open:rotate-45 text-lg leading-none ml-4 shrink-0">
                     +
                   </span>
                 </summary>
-                <p className="px-4 sm:px-5 pb-4 sm:pb-5 text-ink2 text-sm leading-relaxed">
+                <p className="px-4 sm:px-5 pb-4 sm:pb-5 text-ink2 text-base leading-relaxed">
                   {f.a}
                 </p>
               </details>
@@ -328,7 +328,7 @@ export default function Home() {
             transformar tu operación.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-x-4 sm:gap-x-5 gap-y-2 text-xs sm:text-sm text-ink3 mb-8 sm:mb-10">
+          <div className="flex flex-wrap justify-center gap-x-4 sm:gap-x-5 gap-y-2 text-sm sm:text-base text-ink3 mb-8 sm:mb-10">
             <span>15 minutos</span>
             <span>·</span>
             <span>Sin costo</span>
