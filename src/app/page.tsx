@@ -324,7 +324,7 @@ export default function Home() {
             Agendá tus 15 minutos gratis
           </h2>
           <p className="text-ink2 text-base sm:text-lg max-w-lg mx-auto mb-3">
-            Elegí el horario que te quede y te contamos cómo la IA puede
+            Elegí el horario que te quede más cómodo y te contamos cómo la IA puede
             transformar tu operación.
           </p>
 
