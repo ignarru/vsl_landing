@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 
 const R2_BASE = "https://pub-fd739a0187554bf49a5a791d47659975.r2.dev";
 
@@ -10,15 +10,19 @@ const RESOLUTIONS = [
   { label: "480p", src: `${R2_BASE}/vsl_landing-480p.mp4` },
 ];
 
-function getDefaultResolution() {
-  if (typeof window === "undefined") return 0;
-  return window.innerWidth < 768 ? 2 : 0; // 480p on mobile, 1080p on desktop
-}
-
 export default function VideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [current, setCurrent] = useState(getDefaultResolution);
+  const [current, setCurrent] = useState(0);
   const [open, setOpen] = useState(false);
+
+  // Switch to 480p on mobile after mount to avoid hydration mismatch
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setCurrent(2);
+      const video = videoRef.current;
+      if (video) video.src = RESOLUTIONS[2].src;
+    }
+  }, []);
 
   const switchResolution = useCallback(
     (index: number) => {
