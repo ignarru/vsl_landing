@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* ── Surfaces ── */
+  --color-bg: #030712;
+  --color-surface: #0a1120;
+  --color-surface2: #0f1729;
+  --color-surface3: #141e33;
+
+  /* ── Borders (rgba for whisper-quiet separation) ── */
+  --color-border: rgba(56, 119, 214, 0.07);
+  --color-border2: rgba(56, 119, 214, 0.14);
+  --color-border3: rgba(56, 119, 214, 0.22);
+
+  /* ── Text hierarchy ── */
+  --color-ink: #e8edf5;
+  --color-ink2: #8fa3c4;
+  --color-ink3: #4a6589;
+
+  /* ── Brand blue ── */
+  --color-blue: #1d4ed8;
+  --color-blue2: #3b82f6;
+  --color-blue3: #60a5fa;
+  --color-blue4: #93c5fd;
+
+  /* ── Urgency yellow ── */
+  --color-alert: #fbbf24;
+  --color-alert2: #f59e0b;
+  --color-alert-bg: rgba(251, 191, 36, 0.08);
+
+  /* ── Glow system ── */
+  --color-glow: rgba(59, 130, 246, 0.15);
+  --color-glow2: rgba(59, 130, 246, 0.06);
+
+  /* ── Typography ── */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--color-blue); color: white }
+
+/* ── Brand wordmark ── */
+.brand-mark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.125rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.brand-ia {
+  background: linear-gradient(135deg, var(--color-blue3) 0%, var(--color-blue4) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-by {
+  font-size: 0.55em;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+  color: var(--color-ink3);
+  opacity: 0.7;
+  margin: 0 0.08em;
+}
+
+/* ── VSL video container ── */
+.vsl-frame {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border2);
+  background: var(--color-surface);
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.05),
+    0 8px 40px rgba(59, 130, 246, 0.08),
+    0 20px 80px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Qualification banner scroll animation ── */
+@keyframes scroll-x {
+  0% { transform: translateX(0) }
+  100% { transform: translateX(-50%) }
+}
+
+.banner-scroll {
+  animation: scroll-x 20s linear infinite;
+}
+
+/* ── Pulse dot ── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: .4; transform: scale(1) }
+  50% { opacity: 1; transform: scale(1.3) }
+}
+
+/* ── Subtle entrance for sections ── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px) }
+  to { opacity: 1; transform: translateY(0) }
+}
+
+/* ── CTA pulse ring ── */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(29, 78, 216, 0.4) }
+  70% { box-shadow: 0 0 0 12px rgba(29, 78, 216, 0) }
+  100% { box-shadow: 0 0 0 0 rgba(29, 78, 216, 0) }
+}
+
+.cta-pulse {
+  animation: pulse-ring 2.5s ease-out infinite;
+}
+
+/* ── Cal.com iframe styling ── */
+.cal-embed {
+  border-radius: 1rem;
+  border: 1px solid var(--color-border2);
+  overflow: hidden;
+  box-shadow: 0 0 60px var(--color-glow);
+  background: var(--color-surface);
+}
