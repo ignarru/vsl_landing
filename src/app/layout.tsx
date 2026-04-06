@@ -32,6 +32,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_AR",
   },
+  other: {
+    "google-adsense-account": "ca-pub-3694403027462653",
+  },
 };
 
 export default function RootLayout({
