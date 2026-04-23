@@ -192,7 +192,7 @@ export default function Home() {
               color: "#7dd3fc",
               letterSpacing: "0.01em",
             }}>
-              Solo para mayoristas con alto volumen de mensajes
+              Solo para empresas con alto volumen de mensajes
             </span>
           </div>
 
@@ -250,7 +250,7 @@ export default function Home() {
             </a>
             <p style={{ fontSize: "13px", color: "#8ba3cc" }}>
               Sin costo · Sin compromiso ·{" "}
-              <span style={{ color: "rgba(56,189,248,0.75)" }}>Solo para mayoristas</span>
+              <span style={{ color: "rgba(56,189,248,0.75)" }}>Solo para empresas</span>
             </p>
           </div>
         </div>
@@ -325,7 +325,7 @@ export default function Home() {
             <br />es una venta que perdiste
           </h2>
           <p style={{ fontSize: "17px", color: "#8ba3cc", maxWidth: "520px", lineHeight: 1.72 }}>
-            Los mayoristas con alto volumen no pierden ventas por falta de clientes — las pierden por falta de velocidad y disponibilidad.
+            Las empresas con alto volumen no pierden ventas por falta de clientes — las pierden por falta de velocidad y disponibilidad.
           </p>
 
           <div
@@ -556,7 +556,7 @@ export default function Home() {
             className="cta-chips-row"
             style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "24px", flexWrap: "wrap", marginBottom: "32px" }}
           >
-            {["Sin costo", "Sin compromiso", "Solo para mayoristas"].map((c) => (
+            {["Sin costo", "Sin compromiso", "Solo para empresas"].map((c) => (
               <span key={c} style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#8ba3cc" }}>
                 <span style={{ color: "#38bdf8" }}><CheckIcon /></span>{c}
               </span>
