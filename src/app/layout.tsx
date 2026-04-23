@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IAbyIA",
+  title: "IAbyIA — Automatizá tus ventas con IA",
   description:
     "Automatizá el 90% de tus consultas en WhatsApp con IA. Respondé al instante, vendé mientras dormís y recuperá tu inversión en 2-3 meses. Para negocios con +50 consultas diarias.",
   keywords: [
@@ -45,6 +45,13 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        {/* Bricolage Grotesque via Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&display=swap"
+          rel="stylesheet"
+        />
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3694403027462653"
@@ -52,9 +59,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>
