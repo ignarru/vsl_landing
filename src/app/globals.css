@@ -221,7 +221,8 @@ h1, h2, h3 {
    MOBILE
 ───────────────────────────────────────── */
 @media (max-width: 768px) {
-  h1 { font-size: clamp(32px, 8vw, 52px) !important; }
+  /* H1 hero debe dominar visualmente sobre todo lo demás en mobile */
+  h1 { font-size: clamp(38px, 9vw, 56px) !important; line-height: 1.08 !important; }
   h2 { font-size: clamp(24px, 6vw, 36px) !important; }
 
   .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
