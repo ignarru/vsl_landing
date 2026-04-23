@@ -220,10 +220,18 @@ h1, h2, h3 {
 /* ─────────────────────────────────────────
    MOBILE
 ───────────────────────────────────────── */
+/* Nav CTA text — desktop muestra completo, mobile muestra corto */
+.nav-cta-short { display: none; }
+.nav-cta-text  { display: inline; }
+
 @media (max-width: 768px) {
   /* H1 hero debe dominar visualmente sobre todo lo demás en mobile */
   h1 { font-size: clamp(38px, 9vw, 56px) !important; line-height: 1.08 !important; }
   h2 { font-size: clamp(24px, 6vw, 36px) !important; }
+
+  /* Nav CTA — más chico en mobile para no chocar con el logo */
+  .nav-cta-text { display: none; }
+  .nav-cta-short { display: inline; }
 
   .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .two-col-grid { grid-template-columns: 1fr !important; }
