@@ -5,33 +5,67 @@ import { useEffect, useState } from "react";
 export default function CalEmbed() {
   const [loaded, setLoaded] = useState(false);
 
-  // Start loading the iframe after first paint (not blocking render)
   useEffect(() => {
     if (typeof requestIdleCallback === "function") {
       const id = requestIdleCallback(() => setLoaded(true));
       return () => cancelIdleCallback(id);
     } else {
-      // Safari/iOS doesn't support requestIdleCallback
       const id = setTimeout(() => setLoaded(true), 100);
       return () => clearTimeout(id);
     }
   }, []);
 
   return (
-    <div className="cal-embed">
+    <div
+      className="cal-embed"
+      style={{
+        borderRadius: "16px",
+        border: "1px solid rgba(30,143,255,0.18)",
+        overflow: "hidden",
+        boxShadow: "0 0 60px rgba(30,143,255,0.08)",
+        background: "#0b1120",
+        width: "100%",
+        minHeight: "700px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       {loaded ? (
         <iframe
           src="https://cal.com/ignacio.arruvito/iabyia"
-          className="w-full border-none"
-          style={{ height: "660px" }}
-          title="Agendar reunion con IAbyIA"
+          style={{
+            width: "100%",
+            height: "700px",
+            border: "none",
+            display: "block",
+            background: "transparent",
+          }}
+          title="Agendar reunión con IAbyIA"
         />
       ) : (
         <div
-          className="w-full flex items-center justify-center bg-surface"
-          style={{ height: "660px" }}
+          style={{
+            width: "100%",
+            height: "700px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "12px",
+          }}
         >
-          <div className="text-ink3 text-sm">Cargando calendario...</div>
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="rgba(30,143,255,0.4)"
+            strokeWidth="1.4"
+          >
+            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <p style={{ color: "#4a6589", fontSize: "14px" }}>Cargando calendario...</p>
         </div>
       )}
     </div>
