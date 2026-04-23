@@ -6,15 +6,56 @@ import { useEffect } from "react";
 
 const BG_FONT = "'Bricolage Grotesque', sans-serif";
 
-function Brand({ className = "" }: { className?: string }) {
+function Brand({ size = 28 }: { size?: number }) {
   return (
     <span
-      className={`brand-mark ${className}`}
-      style={{ fontFamily: BG_FONT }}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        fontFamily: BG_FONT,
+        fontWeight: 700,
+        fontSize: `${size}px`,
+        letterSpacing: "-0.02em",
+        lineHeight: 1,
+        textDecoration: "none",
+      }}
     >
-      <span className="brand-ia">IA</span>
-      <span className="brand-by">by</span>
-      <span className="brand-ia">IA</span>
+      {/* Ícono cuadrado redondeado con símbolo IA */}
+      <span style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: `${size * 1.1}px`,
+        height: `${size * 1.1}px`,
+        borderRadius: `${size * 0.25}px`,
+        background: "linear-gradient(135deg, #0f6fd4 0%, #1e8fff 60%, #38bdf8 100%)",
+        flexShrink: 0,
+      }}>
+        <svg
+          width={size * 0.62}
+          height={size * 0.62}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="white"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+      </span>
+      {/* Wordmark */}
+      <span style={{
+        background: "linear-gradient(120deg, #e8f0ff 10%, #c0d8ff 90%)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
+      }}>
+        IAbyIA
+      </span>
     </span>
   );
 }
@@ -89,7 +130,7 @@ export default function Home() {
         }}
       >
         <a href="#" style={{ textDecoration: "none" }}>
-          <Brand className="text-2xl" />
+          <Brand size={22} />
         </a>
         <a
           href="#agendar"
@@ -153,8 +194,8 @@ export default function Home() {
             <span className="badge-dot" />
             <span style={{
               fontFamily: BG_FONT,
-              fontSize: "clamp(14px, 1.6vw, 18px)",
-              fontWeight: 700,
+              fontSize: "clamp(12px, 1.3vw, 15px)",
+              fontWeight: 600,
               color: "#7dd3fc",
               letterSpacing: "0.01em",
             }}>
@@ -166,7 +207,7 @@ export default function Home() {
           <h1
             style={{
               fontFamily: BG_FONT,
-              fontSize: "clamp(42px, 5.8vw, 76px)",
+              fontSize: "clamp(38px, 8vw, 76px)",
               fontWeight: 800,
               lineHeight: 1.08,
               letterSpacing: "-0.025em",
@@ -183,7 +224,7 @@ export default function Home() {
           {/* ── SUBHEADLINE ── */}
           <p
             style={{
-              fontSize: "clamp(16px, 1.9vw, 20px)",
+              fontSize: "clamp(15px, 1.9vw, 20px)",
               color: "#8ba3cc",
               maxWidth: "540px",
               lineHeight: 1.72,
@@ -548,7 +589,7 @@ export default function Home() {
         }}
       >
         <div className="footer-inner" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
-          <Brand className="text-xl" />
+          <Brand size={20} />
           <p style={{ fontSize: "13px", color: "#8ba3cc" }}>© 2026 IAbyIA · Buenos Aires, Argentina</p>
           <p style={{ fontSize: "13px", color: "#8ba3cc" }}>Transformamos tareas en resultados.</p>
         </div>
