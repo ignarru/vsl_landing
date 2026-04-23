@@ -408,7 +408,7 @@ export default function Home() {
             {[
               { val: "90%",    label: "Mensajes automatizados" },
               { val: "+30%",   label: "Aumento en ventas" },
-              { val: "4 sem.", label: "Implementación" },
+              { val: "2 sem.", label: "Implementación" },
               { val: "2-3 m.", label: "Recupero de inversión" },
             ].map((m) => (
               <div key={m.label}>
