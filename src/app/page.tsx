@@ -21,32 +21,18 @@ function Brand({ size = 28 }: { size?: number }) {
         textDecoration: "none",
       }}
     >
-      {/* Ícono cuadrado redondeado con símbolo IA */}
-      <span style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: `${size * 1.1}px`,
-        height: `${size * 1.1}px`,
-        borderRadius: `${size * 0.25}px`,
-        background: "linear-gradient(135deg, #0f6fd4 0%, #1e8fff 60%, #38bdf8 100%)",
-        flexShrink: 0,
-      }}>
-        <svg
-          width={size * 0.62}
-          height={size * 0.62}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="white"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-          <path d="M2 17l10 5 10-5"/>
-          <path d="M2 12l10 5 10-5"/>
-        </svg>
-      </span>
+      {/* Logo real */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo.png"
+        alt="IAbyIA logo"
+        style={{
+          width: `${size * 1.3}px`,
+          height: `${size * 1.3}px`,
+          objectFit: "contain",
+          flexShrink: 0,
+        }}
+      />
       {/* Wordmark */}
       <span style={{
         background: "linear-gradient(120deg, #e8f0ff 10%, #c0d8ff 90%)",
@@ -134,16 +120,21 @@ export default function Home() {
         </a>
         <a
           href="#agendar"
-          className="cta-pulse inline-flex items-center gap-2 text-white font-semibold no-underline whitespace-nowrap"
+          className="cta-pulse inline-flex items-center gap-1.5 text-white font-semibold no-underline"
           style={{
-            padding: "10px 22px",
+            padding: "8px 14px",
             background: "linear-gradient(135deg, #0f6fd4, #1e8fff)",
             borderRadius: "9px",
-            fontSize: "14px",
+            fontSize: "13px",
+            whiteSpace: "nowrap",
+            maxWidth: "calc(100vw - 180px)",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
-          <CalIcon size={14} />
-          Agenda tu llamada gratis
+          <CalIcon size={13} />
+          <span className="nav-cta-text">Agenda tu llamada gratis</span>
+          <span className="nav-cta-short">Agendar</span>
         </a>
       </nav>
 
