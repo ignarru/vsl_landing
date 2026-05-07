@@ -1,4 +1,5 @@
-import Image from "next/image";
+"use client";
+
 import CalEmbed from "@/components/cal-embed";
 import ChatWidget from "@/components/chat-widget";
 import MorphingText from "@/components/morphing-text";
@@ -98,13 +99,13 @@ export default function Home() {
       {/* NAV */}
       <nav className="nav-bar">
         <a href="#" className="wordmark">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/assets/logo-icon-transparent.png"
             alt="IAbyIA"
             width={28}
             height={28}
             className="wm-icon"
-            priority
           />
           <span className="wm-ia">IAbyIA</span>
         </a>
@@ -126,7 +127,7 @@ export default function Home() {
           <div className="hero">
             <div className="hero-left">
               <div className="pain-tag reveal">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="#38bdf8">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24">
                   <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                 </svg>
                 Solo para empresas con alto volumen
@@ -356,14 +357,28 @@ export default function Home() {
             <div className="sec-title">Preguntas frecuentes</div>
           </div>
           <div className="faq-list reveal d1">
-            {FAQS.map((f) => (
-              <details key={f.q} className="faq-item">
-                <summary className="faq-summary">
+            {FAQS.map((f, i) => (
+              <div key={f.q} className="faq-item">
+                <button
+                  className="faq-btn"
+                  onClick={(e) => {
+                    const item = (e.currentTarget as HTMLButtonElement).closest(".faq-item");
+                    if (!item) return;
+                    const wasOpen = item.classList.contains("open");
+                    document.querySelectorAll(".faq-item").forEach((i) => i.classList.remove("open"));
+                    if (!wasOpen) item.classList.add("open");
+                  }}
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls={`faq-body-${i}`}
+                >
                   {f.q}
                   <span className="faq-icon">+</span>
-                </summary>
-                <div className="faq-body">{f.a}</div>
-              </details>
+                </button>
+                <div className="faq-body" id={`faq-body-${i}`}>
+                  {f.a}
+                </div>
+              </div>
             ))}
           </div>
         </section>
@@ -401,7 +416,8 @@ export default function Home() {
           className="wordmark"
           style={{ fontSize: "18px" }}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/assets/logo-icon-transparent.png"
             alt="IAbyIA"
             width={24}
@@ -412,13 +428,8 @@ export default function Home() {
           <span className="wm-ia">IAbyIA</span>
         </a>
         <p style={{ fontSize: "13px", color: "var(--color-ink3)" }}>
-          © 2026 IAbyIA · Buenos Aires, Argentina
+          © 2026 IAbyIA · Buenos Aires, Argentina · Todos los derechos reservados
         </p>
-        <div className="footer-links">
-          <a href="#como" className="footer-link">Cómo funciona</a>
-          <a href="#faq" className="footer-link">FAQ</a>
-          <a href="#agenda" className="footer-link">Agendar</a>
-        </div>
       </footer>
     </>
   );
