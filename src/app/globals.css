@@ -650,7 +650,7 @@ h1, h2, h3 {
   cursor: default;
 }
 .pain-card:hover {
-  border-color: rgba(56,189,248,0.25);
+  border-color: rgba(255,107,107,0.35);
   transform: translateY(-3px);
 }
 .pain-card-num {
