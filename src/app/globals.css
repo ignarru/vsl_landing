@@ -959,35 +959,21 @@ h1, h2, h3 {
   font-size: 22px;
   color: var(--color-cyan);
   flex-shrink: 0;
-  transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-/* Smooth height animation usando max-height generoso + opacity */
-.faq-body-wrap {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition:
-    max-height 0.45s cubic-bezier(0.25, 0.1, 0.25, 1),
-    opacity 0.3s ease;
-  will-change: max-height, opacity;
+  transition: transform 0.25s;
 }
 
 .faq-body {
   font-size: 14px;
   color: var(--color-ink2);
   line-height: 1.75;
-  padding-top: 0;
-  transition: padding 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-.faq-item.open .faq-body-wrap {
-  max-height: 500px;
-  opacity: 1;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
 }
 
 .faq-item.open .faq-body {
-  padding-bottom: 22px;
+  max-height: 300px;
+  padding-bottom: 20px;
 }
 
 .faq-item.open .faq-icon {
