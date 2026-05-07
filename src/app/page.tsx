@@ -375,8 +375,10 @@ export default function Home() {
                   {f.q}
                   <span className="faq-icon">+</span>
                 </button>
-                <div className="faq-body" id={`faq-body-${i}`}>
-                  {f.a}
+                <div className="faq-body-wrap">
+                  <div className="faq-body" id={`faq-body-${i}`}>
+                    {f.a}
+                  </div>
                 </div>
               </div>
             ))}
