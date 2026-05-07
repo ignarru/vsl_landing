@@ -16,31 +16,10 @@ export default function CalEmbed() {
   }, []);
 
   return (
-    <div
-      className="cal-embed"
-      style={{
-        borderRadius: "16px",
-        border: "1px solid rgba(30,143,255,0.18)",
-        overflow: "hidden",
-        boxShadow: "0 0 60px rgba(30,143,255,0.08)",
-        background: "#0b1120",
-        width: "100%",
-        minHeight: "700px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <div className="cal-embed">
       {loaded ? (
         <iframe
           src="https://cal.com/ignacio.arruvito/iabyia"
-          style={{
-            width: "100%",
-            height: "700px",
-            border: "none",
-            display: "block",
-            background: "transparent",
-          }}
           title="Agendar reunión con IAbyIA"
         />
       ) : (
@@ -63,7 +42,7 @@ export default function CalEmbed() {
             stroke="rgba(30,143,255,0.4)"
             strokeWidth="1.4"
           >
-            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <p style={{ color: "#4a6589", fontSize: "14px" }}>Cargando calendario...</p>
         </div>
