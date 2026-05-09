@@ -1069,13 +1069,13 @@ h1, h2, h3 {
   display: block;
   width: 100%;
   border: none;
-  height: 600px;
+  height: 680px;
   background: transparent;
 }
 
 @media (max-width: 768px) {
   .cal-embed iframe {
-    height: 720px;
+    height: 780px;
   }
 }
 
