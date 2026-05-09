@@ -1135,6 +1135,7 @@ footer {
     height: 540px;
     min-height: 0;
     transform: none !important;
+    pointer-events: none;
   }
   .chat-messages {
     overflow: hidden;
