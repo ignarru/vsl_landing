@@ -1132,7 +1132,7 @@ footer {
     gap: 40px;
   }
   .chat-widget {
-    height: 380px;
+    height: 640px;
     min-height: 0;
     transform: none !important;
   }
