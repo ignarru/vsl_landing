@@ -360,7 +360,7 @@ h1, h2, h3 {
     0 0 0 1px rgba(255,255,255,0.04),
     0 0 80px rgba(30,143,255,0.08);
   overflow: hidden;
-  min-height: 500px;
+  height: 560px;
   display: flex;
   flex-direction: column;
   transform: perspective(1000px) rotateY(-2deg) rotateX(1deg);
