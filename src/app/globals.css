@@ -263,7 +263,7 @@ h1, h2, h3 {
 .h1 {
   font-family: 'Bricolage Grotesque', sans-serif;
   font-weight: 800;
-  font-size: clamp(1.6rem, 6.5vw, 3.9rem);
+  font-size: clamp(2.4rem, 5vw, 3.9rem);
   letter-spacing: -0.03em;
   line-height: 1.04;
   color: var(--color-ink);
@@ -292,6 +292,11 @@ h1, h2, h3 {
 }
 .morph-phrase.active { opacity: 1; transform: translateY(0); }
 .morph-phrase.exit   { opacity: 0; transform: translateY(-18px); }
+
+@media (max-width: 600px) {
+  .morph-wrap { height: 2.3em; }
+  .morph-phrase { white-space: normal; }
+}
 
 .hero-sub {
   font-size: 17px;
