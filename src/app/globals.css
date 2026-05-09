@@ -1132,9 +1132,12 @@ footer {
     gap: 40px;
   }
   .chat-widget {
-    height: 640px;
+    height: 540px;
     min-height: 0;
     transform: none !important;
+  }
+  .chat-messages {
+    overflow: hidden;
   }
   .pain-grid,
   .compare-grid,
@@ -1167,6 +1170,10 @@ footer {
     gap: 16px;
     padding: 24px;
   }
+}
+
+@media (max-width: 600px) {
+  .chat-widget { height: 700px; }
 }
 
 @media (max-width: 480px) {
