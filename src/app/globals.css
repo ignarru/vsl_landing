@@ -422,12 +422,16 @@ h1, h2, h3 {
 
 .chat-messages {
   flex: 1;
+  min-height: 0;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
 }
+.chat-messages::-webkit-scrollbar { display: none; }
 
 .msg {
   max-width: 82%;
@@ -1128,7 +1132,8 @@ footer {
     gap: 40px;
   }
   .chat-widget {
-    min-height: 380px;
+    height: 380px;
+    min-height: 0;
     transform: none !important;
   }
   .pain-grid,
