@@ -9,7 +9,7 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "IAbyIA — Tu negocio pierde ventas mientras dormís",
+  title: "IAbyIA",
   description:
     "Automatizá el 90% de tus consultas en WhatsApp con IA. Respondé al instante, vendé mientras dormís y recuperá tu inversión en 2-3 meses. Para negocios con +50 consultas diarias.",
   keywords: [
