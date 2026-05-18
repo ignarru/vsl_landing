@@ -2,10 +2,60 @@
 
 import { useEffect, useState } from "react";
 
+const CAL_BASE = "https://cal.com/ignacio.arruvito/iabyia";
+const STORAGE_KEY = "iabyia_video_origen";
+const TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 días
+
+/** YouTube video IDs son 11 caracteres del set [A-Za-z0-9_-]. */
+function isValidVideoId(v: string | null): v is string {
+  return !!v && /^[A-Za-z0-9_-]{11}$/.test(v);
+}
+
+/**
+ * Resuelve el video de origen: primero del `utm_content` de la URL actual
+ * (lo persiste para sobrevivir navegación), si no, del último guardado.
+ */
+function resolveVideoId(): string | null {
+  if (typeof window === "undefined") return null;
+
+  const fromUrl = new URLSearchParams(window.location.search).get("utm_content");
+  if (isValidVideoId(fromUrl)) {
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ v: fromUrl, t: Date.now() }),
+      );
+    } catch {
+      /* localStorage no disponible — seguimos igual */
+    }
+    return fromUrl;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const { v, t } = JSON.parse(raw) as { v?: string; t?: number };
+      if (isValidVideoId(v ?? null) && typeof t === "number" && Date.now() - t < TTL_MS) {
+        return v as string;
+      }
+    }
+  } catch {
+    /* dato corrupto o sin acceso — lo ignoramos */
+  }
+  return null;
+}
+
 export default function CalEmbed() {
   const [loaded, setLoaded] = useState(false);
+  const [calSrc, setCalSrc] = useState(CAL_BASE);
 
   useEffect(() => {
+    // Inyectar el video de origen como campo oculto `video_id` de cal.com
+    const videoId = resolveVideoId();
+    if (videoId) {
+      setCalSrc(`${CAL_BASE}?video_id=${encodeURIComponent(videoId)}`);
+    }
+
     if (typeof requestIdleCallback === "function") {
       const id = requestIdleCallback(() => setLoaded(true));
       return () => cancelIdleCallback(id);
@@ -19,7 +69,7 @@ export default function CalEmbed() {
     <div className="cal-embed">
       {loaded ? (
         <iframe
-          src="https://cal.com/ignacio.arruvito/iabyia"
+          src={calSrc}
           title="Agendar reunión con IAbyIA"
         />
       ) : (
