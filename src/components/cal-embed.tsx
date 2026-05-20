@@ -3,46 +3,86 @@
 import { useEffect, useState } from "react";
 
 const CAL_BASE = "https://cal.com/ignacio.arruvito/iabyia";
-const STORAGE_KEY = "iabyia_video_origen";
+const STORAGE_KEY = "iabyia_atribucion";
+const STORAGE_KEY_LEGACY = "iabyia_video_origen";
 const TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 días
 
+interface Attribution {
+  source?: string;  // utm_source: instagram, tiktok, linkedin, youtube
+  medium?: string;  // utm_medium: bio, channel, video, etc.
+  videoId?: string; // utm_content: solo si es un ID válido de YouTube
+}
+
 /** YouTube video IDs son 11 caracteres del set [A-Za-z0-9_-]. */
-function isValidVideoId(v: string | null): v is string {
+function isValidVideoId(v: string | null | undefined): v is string {
   return !!v && /^[A-Za-z0-9_-]{11}$/.test(v);
 }
 
-/**
- * Resuelve el video de origen: primero del `utm_content` de la URL actual
- * (lo persiste para sobrevivir navegación), si no, del último guardado.
- */
-function resolveVideoId(): string | null {
-  if (typeof window === "undefined") return null;
+/** Sanitiza un valor de UTM — solo alfanumérico, guiones y barras bajas, máx 40 chars. */
+function sanitizeUtm(v: string | null): string | undefined {
+  if (!v) return undefined;
+  const clean = v.toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 40);
+  return clean.length > 0 ? clean : undefined;
+}
 
-  const fromUrl = new URLSearchParams(window.location.search).get("utm_content");
-  if (isValidVideoId(fromUrl)) {
+/**
+ * Resuelve la atribución del visitante: prioriza UTMs de la URL actual (last-touch),
+ * y la persiste para sobrevivir navegación interna. Si no hay UTMs en la URL,
+ * usa lo guardado en localStorage (dentro del TTL).
+ */
+function resolveAttribution(): Attribution {
+  if (typeof window === "undefined") return {};
+
+  const url = new URLSearchParams(window.location.search);
+  const fromUrl = {
+    source: sanitizeUtm(url.get("utm_source")),
+    medium: sanitizeUtm(url.get("utm_medium")),
+    content: url.get("utm_content"),
+  };
+  const hasUrlAttribution = fromUrl.source || fromUrl.medium || fromUrl.content;
+
+  if (hasUrlAttribution) {
+    const att: Attribution = {
+      source:  fromUrl.source,
+      medium:  fromUrl.medium,
+      videoId: isValidVideoId(fromUrl.content) ? fromUrl.content : undefined,
+    };
     try {
       window.localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ v: fromUrl, t: Date.now() }),
+        JSON.stringify({ ...att, t: Date.now() }),
       );
     } catch {
       /* localStorage no disponible — seguimos igual */
     }
-    return fromUrl;
+    return att;
   }
 
+  // Sin UTMs en la URL: leer del storage si vigente
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const { v, t } = JSON.parse(raw) as { v?: string; t?: number };
-      if (isValidVideoId(v ?? null) && typeof t === "number" && Date.now() - t < TTL_MS) {
-        return v as string;
+      const parsed = JSON.parse(raw) as Attribution & { t?: number };
+      if (typeof parsed.t === "number" && Date.now() - parsed.t < TTL_MS) {
+        return {
+          source:  parsed.source,
+          medium:  parsed.medium,
+          videoId: isValidVideoId(parsed.videoId) ? parsed.videoId : undefined,
+        };
+      }
+    }
+    // Fallback al storage viejo (solo video_id) para no perder atribución
+    const legacyRaw = window.localStorage.getItem(STORAGE_KEY_LEGACY);
+    if (legacyRaw) {
+      const { v, t } = JSON.parse(legacyRaw) as { v?: string; t?: number };
+      if (isValidVideoId(v) && typeof t === "number" && Date.now() - t < TTL_MS) {
+        return { videoId: v };
       }
     }
   } catch {
     /* dato corrupto o sin acceso — lo ignoramos */
   }
-  return null;
+  return {};
 }
 
 export default function CalEmbed() {
@@ -50,11 +90,13 @@ export default function CalEmbed() {
   const [calSrc, setCalSrc] = useState(CAL_BASE);
 
   useEffect(() => {
-    // Inyectar el video de origen como campo oculto `video_id` de cal.com
-    const videoId = resolveVideoId();
-    if (videoId) {
-      setCalSrc(`${CAL_BASE}?video_id=${encodeURIComponent(videoId)}`);
-    }
+    const att = resolveAttribution();
+    const params = new URLSearchParams();
+    if (att.videoId) params.set("video_id",   att.videoId);
+    if (att.source)  params.set("utm_source", att.source);
+    if (att.medium)  params.set("utm_medium", att.medium);
+    const qs = params.toString();
+    if (qs) setCalSrc(`${CAL_BASE}?${qs}`);
 
     if (typeof requestIdleCallback === "function") {
       const id = requestIdleCallback(() => setLoaded(true));
