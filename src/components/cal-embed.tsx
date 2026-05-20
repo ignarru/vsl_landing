@@ -42,10 +42,14 @@ function resolveAttribution(): Attribution {
   const hasUrlAttribution = fromUrl.source || fromUrl.medium || fromUrl.content;
 
   if (hasUrlAttribution) {
+    // Solo consideramos utm_content como video_id si la fuente es claramente YouTube
+    // (utm_source=youtube + utm_medium=video). Sino "link_in_bio" o similares de
+    // 11 chars en otras plataformas crean falsos positivos.
+    const isYouTubeVideo = fromUrl.source === "youtube" && fromUrl.medium === "video";
     const att: Attribution = {
       source:  fromUrl.source,
       medium:  fromUrl.medium,
-      videoId: isValidVideoId(fromUrl.content) ? fromUrl.content : undefined,
+      videoId: isYouTubeVideo && isValidVideoId(fromUrl.content) ? fromUrl.content : undefined,
     };
     try {
       window.localStorage.setItem(
