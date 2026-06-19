@@ -3,6 +3,7 @@
 import CalEmbed from "@/components/cal-embed";
 import ChatWidget from "@/components/chat-widget";
 import CostCalculator from "@/components/cost-calculator";
+import DiagnosticQuiz from "@/components/diagnostic-quiz";
 import MorphingText from "@/components/morphing-text";
 import ScrollEffects from "@/components/scroll-effects";
 
@@ -386,6 +387,9 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        {/* QUIZ DE DIAGNÓSTICO (arriba del calendario) */}
+        <DiagnosticQuiz />
 
         {/* CTA FINAL + CAL EMBED */}
         <section className="cta-section" id="agenda">
