@@ -428,7 +428,7 @@ export default function Home() {
           <span className="wm-ia">IAbyIA</span>
         </a>
         <p style={{ fontSize: "13px", color: "var(--color-ink3)" }}>
-          © 2026 IAbyIA · Buenos Aires, Argentina · Todos los derechos reservados
+          © 2026 IAbyIA — Ignacio Arruvito · Buenos Aires, Argentina · Todos los derechos reservados
         </p>
       </footer>
     </>
