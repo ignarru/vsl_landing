@@ -1,15 +1,17 @@
-"use client";
+// Construye el link a cal.com preservando la atribución (UTMs) del visitante.
+// La lógica de captura es la misma que usaba el antiguo <CalEmbed/>: prioriza
+// los UTMs de la URL (last-touch) y los persiste 30 días en localStorage para
+// sobrevivir la navegación interna. El link resultante lleva los UTMs en la
+// query, así cal.com los recibe igual que antes lo hacía el iframe.
 
-import { useEffect, useState } from "react";
-
-const CAL_BASE = "https://cal.com/ignacio.arruvito/iabyia";
+export const CAL_BASE = "https://cal.com/ignacio.arruvito/iabyia";
 const STORAGE_KEY = "iabyia_atribucion";
 const STORAGE_KEY_LEGACY = "iabyia_video_origen";
 const TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 días
 
 interface Attribution {
-  source?: string;  // utm_source: instagram, tiktok, linkedin, youtube
-  medium?: string;  // utm_medium: bio, channel, video, etc.
+  source?: string; // utm_source: instagram, tiktok, linkedin, youtube
+  medium?: string; // utm_medium: bio, channel, video, etc.
   videoId?: string; // utm_content: solo si es un ID válido de YouTube
 }
 
@@ -47,15 +49,12 @@ function resolveAttribution(): Attribution {
     // 11 chars en otras plataformas crean falsos positivos.
     const isYouTubeVideo = fromUrl.source === "youtube" && fromUrl.medium === "video";
     const att: Attribution = {
-      source:  fromUrl.source,
-      medium:  fromUrl.medium,
+      source: fromUrl.source,
+      medium: fromUrl.medium,
       videoId: isYouTubeVideo && isValidVideoId(fromUrl.content) ? fromUrl.content : undefined,
     };
     try {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ ...att, t: Date.now() }),
-      );
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...att, t: Date.now() }));
     } catch {
       /* localStorage no disponible — seguimos igual */
     }
@@ -69,8 +68,8 @@ function resolveAttribution(): Attribution {
       const parsed = JSON.parse(raw) as Attribution & { t?: number };
       if (typeof parsed.t === "number" && Date.now() - parsed.t < TTL_MS) {
         return {
-          source:  parsed.source,
-          medium:  parsed.medium,
+          source: parsed.source,
+          medium: parsed.medium,
           videoId: isValidVideoId(parsed.videoId) ? parsed.videoId : undefined,
         };
       }
@@ -89,60 +88,13 @@ function resolveAttribution(): Attribution {
   return {};
 }
 
-export default function CalEmbed() {
-  const [loaded, setLoaded] = useState(false);
-  const [calSrc, setCalSrc] = useState(CAL_BASE);
-
-  useEffect(() => {
-    const att = resolveAttribution();
-    const params = new URLSearchParams();
-    if (att.videoId) params.set("video_id",   att.videoId);
-    if (att.source)  params.set("utm_source", att.source);
-    if (att.medium)  params.set("utm_medium", att.medium);
-    const qs = params.toString();
-    if (qs) setCalSrc(`${CAL_BASE}?${qs}`);
-
-    if (typeof requestIdleCallback === "function") {
-      const id = requestIdleCallback(() => setLoaded(true));
-      return () => cancelIdleCallback(id);
-    } else {
-      const id = setTimeout(() => setLoaded(true), 100);
-      return () => clearTimeout(id);
-    }
-  }, []);
-
-  return (
-    <div className="cal-embed">
-      {loaded ? (
-        <iframe
-          src={calSrc}
-          title="Agendar reunión con IAbyIA"
-        />
-      ) : (
-        <div
-          style={{
-            width: "100%",
-            height: "700px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "12px",
-          }}
-        >
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="rgba(30,143,255,0.4)"
-            strokeWidth="1.4"
-          >
-            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p style={{ color: "#4a6589", fontSize: "14px" }}>Cargando calendario...</p>
-        </div>
-      )}
-    </div>
-  );
+/** Devuelve la URL de cal.com con los UTMs del visitante incrustados en la query. */
+export function buildCalUrl(): string {
+  const att = resolveAttribution();
+  const params = new URLSearchParams();
+  if (att.videoId) params.set("video_id", att.videoId);
+  if (att.source) params.set("utm_source", att.source);
+  if (att.medium) params.set("utm_medium", att.medium);
+  const qs = params.toString();
+  return qs ? `${CAL_BASE}?${qs}` : CAL_BASE;
 }

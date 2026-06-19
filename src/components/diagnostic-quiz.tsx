@@ -52,7 +52,7 @@ function resultFor(score: number) {
   };
 }
 
-export default function DiagnosticQuiz() {
+export default function DiagnosticQuiz({ calUrl }: { calUrl: string }) {
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
@@ -114,7 +114,9 @@ export default function DiagnosticQuiz() {
             <div className="qr-big grad-text">{result.title}</div>
             <div className="qr-text">{result.text}</div>
             <a
-              href="#agenda"
+              href={calUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-primary"
               style={{ marginLeft: "auto", marginRight: "auto" }}
             >

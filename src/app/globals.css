@@ -1054,30 +1054,7 @@ h1, h2, h3 {
 }
 .cta-chip::before { content: '✓ '; color: var(--color-cyan); }
 
-/* Cal embed (kept from original site) */
-.cal-embed {
-  border-radius: 18px;
-  border: 1px solid var(--color-border2);
-  overflow: hidden;
-  box-shadow: 0 0 80px rgba(30,143,255,0.08);
-  background: var(--color-surface);
-  width: 100%;
-  max-width: 900px;
-  margin: 40px auto 0;
-}
-.cal-embed iframe {
-  display: block;
-  width: 100%;
-  border: none;
-  height: 720px;
-  background: transparent;
-}
-
-@media (max-width: 768px) {
-  .cal-embed iframe {
-    height: 800px;
-  }
-}
+/* (El cal embed se reemplazó por un botón a cal.com que preserva los UTMs) */
 
 /* ─────────────────────────────────────────
    FOOTER

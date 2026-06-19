@@ -18,7 +18,7 @@ function trackFill(value: number, min: number, max: number) {
   return `linear-gradient(90deg, #1e8fff 0%, #38bdf8 ${pct}%, var(--color-surface2) ${pct}%)`;
 }
 
-export default function CostCalculator() {
+export default function CostCalculator({ calUrl }: { calUrl: string }) {
   const [msg, setMsg] = useState(50);
   const [ticket, setTicket] = useState(50000);
   const [pct, setPct] = useState(30);
@@ -143,7 +143,12 @@ export default function CostCalculator() {
             {fmt.format(recover)} <span>/ mes</span>
           </div>
 
-          <a href="#agenda" className="res-cta">
+          <a
+            href={calUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="res-cta"
+          >
             Quiero recuperar esa plata →
           </a>
         </div>

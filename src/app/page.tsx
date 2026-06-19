@@ -1,11 +1,12 @@
 "use client";
 
-import CalEmbed from "@/components/cal-embed";
+import { useEffect, useState } from "react";
 import ChatWidget from "@/components/chat-widget";
 import CostCalculator from "@/components/cost-calculator";
 import DiagnosticQuiz from "@/components/diagnostic-quiz";
 import MorphingText from "@/components/morphing-text";
 import ScrollEffects from "@/components/scroll-effects";
+import { CAL_BASE, buildCalUrl } from "@/lib/cal-link";
 
 const TICKER_ITEMS = [
   "WhatsApp Business API",
@@ -91,6 +92,13 @@ const FAQS = [
 ];
 
 export default function Home() {
+  // Link a cal.com con los UTMs del visitante. Arranca en la base (SSR) y se
+  // completa con la atribución al montar en el cliente.
+  const [calUrl, setCalUrl] = useState(CAL_BASE);
+  useEffect(() => {
+    setCalUrl(buildCalUrl());
+  }, []);
+
   return (
     <>
       <ScrollEffects />
@@ -116,7 +124,7 @@ export default function Home() {
           <a href="#como" className="nav-link">Cómo funciona</a>
           <a href="#faq" className="nav-link">FAQ</a>
         </div>
-        <a href="#agenda" className="nav-cta">
+        <a href={calUrl} target="_blank" rel="noopener noreferrer" className="nav-cta">
           <span className="live-dot" />
           Diagnóstico gratis
           <span className="nav-cta-arrow">→</span>
@@ -149,7 +157,12 @@ export default function Home() {
               </p>
 
               <div className="hero-ctas reveal d4">
-                <a href="#agenda" className="btn-primary">
+                <a
+                  href={calUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary"
+                >
                   Agendá tu diagnóstico gratis →
                 </a>
                 <div className="cta-note">
@@ -198,7 +211,7 @@ export default function Home() {
         </div>
 
         {/* CALCULADORA — costo de no tener IA */}
-        <CostCalculator />
+        <CostCalculator calUrl={calUrl} />
 
         {/* PAIN SECTION */}
         <section className="pain-section" id="dolor">
@@ -342,7 +355,9 @@ export default function Home() {
 
             <div style={{ textAlign: "center", marginTop: "52px" }} className="reveal">
               <a
-                href="#agenda"
+                href={calUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-primary"
                 style={{ marginLeft: "auto", marginRight: "auto" }}
               >
@@ -389,7 +404,7 @@ export default function Home() {
         </section>
 
         {/* QUIZ DE DIAGNÓSTICO (arriba del calendario) */}
-        <DiagnosticQuiz />
+        <DiagnosticQuiz calUrl={calUrl} />
 
         {/* CTA FINAL + CAL EMBED */}
         <section className="cta-section" id="agenda">
@@ -412,7 +427,15 @@ export default function Home() {
           </div>
 
           <div className="reveal d1" style={{ position: "relative", zIndex: 2 }}>
-            <CalEmbed />
+            <a
+              href={calUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+              style={{ marginLeft: "auto", marginRight: "auto", marginTop: "8px" }}
+            >
+              Agendá tu diagnóstico gratis →
+            </a>
           </div>
         </section>
       </main>
