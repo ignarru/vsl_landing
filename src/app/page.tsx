@@ -415,27 +415,29 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer>
-        <a
-          href="#"
-          className="wordmark"
-          style={{ fontSize: "18px" }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/assets/logo-icon-transparent.png"
-            alt="IAbyIA"
-            width={24}
-            height={24}
-            className="wm-icon"
-            style={{ width: "24px", height: "24px" }}
-          />
-          <span className="wm-ia">IAbyIA</span>
-        </a>
-        <nav className="footer-links">
-          <a href="/privacidad.html" className="footer-link">Política de Privacidad</a>
-          <a href="/terminos.html" className="footer-link">Términos del Servicio</a>
-        </nav>
-        <p style={{ fontSize: "13px", color: "var(--color-ink3)" }}>
+        <div className="footer-top">
+          <a
+            href="#"
+            className="wordmark"
+            style={{ fontSize: "18px" }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/logo-icon-transparent.png"
+              alt="IAbyIA"
+              width={24}
+              height={24}
+              className="wm-icon"
+              style={{ width: "24px", height: "24px" }}
+            />
+            <span className="wm-ia">IAbyIA</span>
+          </a>
+          <nav className="footer-links">
+            <a href="/privacidad.html" className="footer-link">Política de Privacidad</a>
+            <a href="/terminos.html" className="footer-link">Términos del Servicio</a>
+          </nav>
+        </div>
+        <p className="footer-copy">
           © 2026 IAbyIA — Ignacio Arruvito · Buenos Aires, Argentina · Todos los derechos reservados
         </p>
       </footer>

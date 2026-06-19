@@ -98,21 +98,12 @@ a {
   line-height: 1;
 }
 
-.brand .wordmark .ia {
-  background: var(--grad);
+.brand .wordmark .wm-ia {
+  background: linear-gradient(120deg, #e8f0ff 10%, #c0d8ff 90%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-}
-
-.brand .wordmark .by {
-  color: var(--ink-2);
-  opacity: 0.7;
-  font-weight: 500;
-  font-size: 0.62em;
-  letter-spacing: 0.04em;
-  text-transform: lowercase;
 }
 
 .header-link {

@@ -1087,10 +1087,22 @@ footer {
   border-top: 1px solid rgba(255,255,255,0.06);
   background: rgba(7,13,26,0.95);
   display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.footer-top {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
+}
+.footer-copy {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-ink3);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 18px;
 }
 .footer-links {
   display: flex;
@@ -1166,10 +1178,12 @@ footer {
   .testi-card { padding: 32px 24px; }
 
   footer {
-    flex-direction: column;
-    text-align: center;
     gap: 16px;
-    padding: 24px;
+    padding: 28px 24px;
+  }
+  .footer-top {
+    flex-direction: column;
+    gap: 14px;
   }
 }
 
