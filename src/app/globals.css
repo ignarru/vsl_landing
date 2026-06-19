@@ -710,12 +710,13 @@ h1, h2, h3 {
   font-weight: 800;
   font-size: 2.8rem;
   letter-spacing: -0.04em;
-  line-height: 1;
+  line-height: 1.2;
+  padding: 0.06em 0;
   background: linear-gradient(120deg, #3ba3ff 10%, #38bdf8 90%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 .stat-label {
   font-size: 13px;
