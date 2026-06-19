@@ -2,6 +2,7 @@
 
 import CalEmbed from "@/components/cal-embed";
 import ChatWidget from "@/components/chat-widget";
+import CostCalculator from "@/components/cost-calculator";
 import MorphingText from "@/components/morphing-text";
 import ScrollEffects from "@/components/scroll-effects";
 
@@ -195,12 +196,15 @@ export default function Home() {
           </div>
         </div>
 
+        {/* CALCULADORA — costo de no tener IA */}
+        <CostCalculator />
+
         {/* PAIN SECTION */}
         <section className="pain-section" id="dolor">
           <div className="reveal">
             <div className="sec-label">El problema real</div>
             <div className="sec-title">
-              Cuánto te cuesta <em className="grad-text">no tener IA</em> hoy
+              Por qué se te <em className="grad-text">escapan esas ventas</em>
             </div>
             <div className="sec-sub">
               No es una pregunta de tecnología. Es una pregunta de cuánto dinero estás dejando
@@ -427,6 +431,10 @@ export default function Home() {
           />
           <span className="wm-ia">IAbyIA</span>
         </a>
+        <nav className="footer-links">
+          <a href="/privacidad.html" className="footer-link">Política de Privacidad</a>
+          <a href="/terminos.html" className="footer-link">Términos del Servicio</a>
+        </nav>
         <p style={{ fontSize: "13px", color: "var(--color-ink3)" }}>
           © 2026 IAbyIA — Ignacio Arruvito · Buenos Aires, Argentina · Todos los derechos reservados
         </p>
