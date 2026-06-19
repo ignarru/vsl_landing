@@ -403,41 +403,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* QUIZ DE DIAGNÓSTICO (arriba del calendario) */}
+        {/* QUIZ DE DIAGNÓSTICO (cierre de la landing) */}
         <DiagnosticQuiz calUrl={calUrl} />
-
-        {/* CTA FINAL + CAL EMBED */}
-        <section className="cta-section" id="agenda">
-          <div className="reveal" style={{ position: "relative", zIndex: 2 }}>
-            <div className="cta-title">
-              Dejá de <em className="grad-text">perder ventas</em>.
-              <br />
-              Agendá <em className="grad-text">hoy</em>.
-            </div>
-            <div className="cta-sub">
-              Elegí el horario que te quede cómodo. En 15 minutos te mostramos cuánto puede crecer
-              tu negocio con IA.
-            </div>
-            <div className="cta-chips">
-              <span className="cta-chip">Sin costo</span>
-              <span className="cta-chip">Solo 15 minutos</span>
-              <span className="cta-chip">Sin compromiso</span>
-              <span className="cta-chip">Análisis completo</span>
-            </div>
-          </div>
-
-          <div className="reveal d1" style={{ position: "relative", zIndex: 2 }}>
-            <a
-              href={calUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-              style={{ marginLeft: "auto", marginRight: "auto", marginTop: "8px" }}
-            >
-              Agendá tu diagnóstico gratis →
-            </a>
-          </div>
-        </section>
       </main>
 
       {/* FOOTER */}
