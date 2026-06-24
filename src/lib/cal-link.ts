@@ -9,8 +9,9 @@ export const CAL_BASE = "https://cal.com/ignacio.arruvito/iabyia";
 
 interface Attribution {
   source?: string; // utm_source: instagram, tiktok, linkedin, youtube
-  medium?: string; // utm_medium: bio, channel, video, etc.
+  medium?: string; // utm_medium: bio, channel, video, post, etc.
   videoId?: string; // utm_content: solo si es un ID válido de YouTube
+  content?: string; // utm_content genérico (ej: post.id de un post de LinkedIn) — atribución por post
 }
 
 /** YouTube video IDs son 11 caracteres del set [A-Za-z0-9_-]. */
@@ -49,6 +50,9 @@ function resolveAttribution(): Attribution {
     source,
     medium,
     videoId: isYouTubeVideo && isValidVideoId(content) ? content : undefined,
+    // utm_content genérico para fuentes que NO son video de YouTube (ej: post.id de
+    // un post de LinkedIn). En YouTube el id ya viaja como video_id, no lo duplicamos.
+    content: !isYouTubeVideo ? sanitizeUtm(content) : undefined,
   };
 }
 
@@ -59,6 +63,7 @@ export function buildCalUrl(): string {
   if (att.videoId) params.set("video_id", att.videoId);
   if (att.source) params.set("utm_source", att.source);
   if (att.medium) params.set("utm_medium", att.medium);
+  if (att.content) params.set("utm_content", att.content);
   const qs = params.toString();
   return qs ? `${CAL_BASE}?${qs}` : CAL_BASE;
 }
