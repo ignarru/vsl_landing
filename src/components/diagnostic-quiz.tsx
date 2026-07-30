@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { trackQuizPaso, trackQuizFin } from "@/lib/track";
 
-type Opt = { n: string; t: string; score: number };
+// `v` es el slug que se guarda en el dashboard: así las respuestas quedan legibles en la DB
+// ("mas_100") en vez de una letra sin contexto ("C"), y reordenar las opciones acá no invalida
+// el histórico. ⚠️ Si cambiás un slug, actualizá QUIZ_LABELS en el sales-dashboard
+// (src/lib/landing-metrics.ts) o la etiqueta vieja se sigue mostrando cruda.
+type Opt = { n: string; t: string; score: number; v: string };
 type Step = { q: string; sub: string; opts: Opt[] };
 
 const STEPS: Step[] = [
@@ -10,27 +15,27 @@ const STEPS: Step[] = [
     q: "¿Cuántos mensajes recibís por día?",
     sub: "WhatsApp, Instagram, web — todo junto.",
     opts: [
-      { n: "A", t: "Menos de 30", score: 1 },
-      { n: "B", t: "Entre 30 y 100", score: 2 },
-      { n: "C", t: "Más de 100", score: 3 },
+      { n: "A", t: "Menos de 30", score: 1, v: "menos_30" },
+      { n: "B", t: "Entre 30 y 100", score: 2, v: "30_100" },
+      { n: "C", t: "Más de 100", score: 3, v: "mas_100" },
     ],
   },
   {
     q: "¿Quién responde hoy esos mensajes?",
     sub: "La realidad, sin filtro.",
     opts: [
-      { n: "A", t: "Yo mismo, como puedo", score: 3 },
-      { n: "B", t: "Una o dos personas del equipo", score: 2 },
-      { n: "C", t: "Un equipo dedicado de atención", score: 1 },
+      { n: "A", t: "Yo mismo, como puedo", score: 3, v: "yo" },
+      { n: "B", t: "Una o dos personas del equipo", score: 2, v: "equipo_chico" },
+      { n: "C", t: "Un equipo dedicado de atención", score: 1, v: "equipo_dedicado" },
     ],
   },
   {
     q: "¿Qué te duele más hoy?",
     sub: "Lo que más te quita el sueño.",
     opts: [
-      { n: "A", t: "Perder ventas fuera de horario", score: 3 },
-      { n: "B", t: "El tiempo que se va en responder lo mismo", score: 2 },
-      { n: "C", t: "No poder crecer sin contratar más gente", score: 2 },
+      { n: "A", t: "Perder ventas fuera de horario", score: 3, v: "fuera_horario" },
+      { n: "B", t: "El tiempo que se va en responder lo mismo", score: 2, v: "tiempo_repetitivo" },
+      { n: "C", t: "No poder crecer sin contratar más gente", score: 2, v: "no_crecer" },
     ],
   },
 ];
@@ -56,12 +61,19 @@ export default function DiagnosticQuiz({ calUrl }: { calUrl: string }) {
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  // Respuestas elegidas, para mandarlas junto al score al terminar. El scoring no cambia.
+  const respuestas = useRef<string[]>([]);
 
-  function choose(s: number) {
-    const total = score + s;
+  function choose(o: Opt) {
+    const total = score + o.score;
+    respuestas.current[step] = o.v;
     setScore(total);
+    trackQuizPaso(step + 1, o.n, o.v, o.score);
     if (step < STEPS.length - 1) setStep(step + 1);
-    else setDone(true);
+    else {
+      setDone(true);
+      trackQuizFin(total, [...respuestas.current]);
+    }
   }
 
   const result = done ? resultFor(score) : null;
@@ -98,7 +110,7 @@ export default function DiagnosticQuiz({ calUrl }: { calUrl: string }) {
                   key={o.n}
                   className="quiz-opt"
                   type="button"
-                  onClick={() => choose(o.score)}
+                  onClick={() => choose(o)}
                 >
                   <span className="qo-n">{o.n}</span>
                   {o.t}
@@ -119,6 +131,7 @@ export default function DiagnosticQuiz({ calUrl }: { calUrl: string }) {
               rel="noopener noreferrer"
               className="btn-primary"
               style={{ marginLeft: "auto", marginRight: "auto" }}
+              data-cta="quiz"
             >
               Quiero mi plan personalizado <span aria-hidden="true">→</span>
             </a>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import Script from "next/script";
+import Tracker from "@/components/tracker";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -65,7 +66,12 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${geistSans.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} antialiased`}>
+        {children}
+        {/* Tracking propio → dashboard.iabyia.com.ar. Es el único que puede unir una visita con
+            la reunión y la venta que generó; GA4 (arriba) queda para el tráfico general. */}
+        <Tracker />
+      </body>
     </html>
   );
 }

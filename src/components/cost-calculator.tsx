@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { trackCalculadora } from "@/lib/track";
 
 // Supuestos (punto medio: ni inflado ni tímido)
 const DAYS = 30; // días de operación al mes
@@ -26,6 +27,17 @@ export default function CostCalculator({ calUrl }: { calUrl: string }) {
   const loss = Math.round(msg * DAYS * (pct / 100) * CONVERSION * ticket);
   const annual = loss * 12;
   const recover = Math.round(loss * RECOVERY);
+
+  // Lo que el visitante declara sobre su propio negocio: volumen, ticket y cuánto pierde hoy.
+  // Es investigación de mercado gratis y, si después agenda, llega a la llamada pre-calificado.
+  // Debounce de 1s + skip del primer render: mover un slider al pasar no cuenta como "la usó",
+  // y sin el debounce cada pixel del slider sería un evento.
+  const primerRender = useRef(true);
+  useEffect(() => {
+    if (primerRender.current) { primerRender.current = false; return; }
+    const t = setTimeout(() => trackCalculadora(msg, ticket, pct, loss), 1000);
+    return () => clearTimeout(t);
+  }, [msg, ticket, pct, loss]);
 
   return (
     <section className="calc-section" id="calculadora">
@@ -148,6 +160,7 @@ export default function CostCalculator({ calUrl }: { calUrl: string }) {
             target="_blank"
             rel="noopener noreferrer"
             className="res-cta"
+            data-cta="calculadora"
           >
             Quiero recuperar esa plata →
           </a>

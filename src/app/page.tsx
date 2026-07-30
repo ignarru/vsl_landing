@@ -7,6 +7,7 @@ import DiagnosticQuiz from "@/components/diagnostic-quiz";
 import MorphingText from "@/components/morphing-text";
 import ScrollEffects from "@/components/scroll-effects";
 import { CAL_BASE, buildCalUrl } from "@/lib/cal-link";
+import { getSid } from "@/lib/track";
 
 const TICKER_ITEMS = [
   "WhatsApp Business API",
@@ -94,9 +95,13 @@ const FAQS = [
 export default function Home() {
   // Link a cal.com con los UTMs del visitante. Arranca en la base (SSR) y se
   // completa con la atribución al montar en el cliente.
+  // Le sumamos el `sid` de la sesión de la landing (ver lib/track.ts): es lo que le permite al
+  // dashboard saber qué visita generó esta reunión. El Tracker ya se montó desde el layout, así
+  // que para cuando corre este efecto el sid existe; si el visitante tiene el tracking apagado
+  // (?nt=1 o Do Not Track), getSid() devuelve "" y el link queda exactamente como antes.
   const [calUrl, setCalUrl] = useState(CAL_BASE);
   useEffect(() => {
-    setCalUrl(buildCalUrl());
+    setCalUrl(buildCalUrl({ sid: getSid() }));
   }, []);
 
   return (
@@ -124,7 +129,9 @@ export default function Home() {
           <a href="#como" className="nav-link">Cómo funciona</a>
           <a href="#faq" className="nav-link">FAQ</a>
         </div>
-        <a href={calUrl} target="_blank" rel="noopener noreferrer" className="nav-cta">
+        {/* data-cta: lo lee el listener delegado de lib/track.ts para saber QUÉ botón convence.
+            No cambia ningún comportamiento del link. */}
+        <a href={calUrl} target="_blank" rel="noopener noreferrer" className="nav-cta" data-cta="nav">
           <span className="live-dot" />
           Diagnóstico gratis
           <span className="nav-cta-arrow">→</span>
@@ -162,6 +169,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-primary"
+                  data-cta="hero"
                 >
                   Agendá tu diagnóstico gratis →
                 </a>
@@ -360,6 +368,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="btn-primary"
                 style={{ marginLeft: "auto", marginRight: "auto" }}
+                data-cta="como"
               >
                 Quiero mi diagnóstico gratis →
               </a>

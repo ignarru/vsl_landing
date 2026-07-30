@@ -56,14 +56,24 @@ function resolveAttribution(): Attribution {
   };
 }
 
-/** Devuelve la URL de cal.com con los UTMs del visitante incrustados en la query. */
-export function buildCalUrl(): string {
+/**
+ * Devuelve la URL de cal.com con los UTMs del visitante incrustados en la query.
+ *
+ * `opts.sid` es el id de la sesión de la landing (ver lib/track.ts). Viaja como campo oculto
+ * `lp_sid` de cal.com para que el dashboard pueda decir "de N visitas, M agendaron".
+ *
+ * ⚠️ El sid NO participa de resolveAttribution() y no la afecta en absoluto: la fuente del lead
+ * se sigue decidiendo SOLO con los UTMs de la URL de esta visita. Mezclar las dos cosas sería
+ * volver al bug que arregló el commit 7a0e1ca (una visita directa heredando una fuente vieja).
+ */
+export function buildCalUrl(opts?: { sid?: string }): string {
   const att = resolveAttribution();
   const params = new URLSearchParams();
   if (att.videoId) params.set("video_id", att.videoId);
   if (att.source) params.set("utm_source", att.source);
   if (att.medium) params.set("utm_medium", att.medium);
   if (att.content) params.set("utm_content", att.content);
+  if (opts?.sid) params.set("lp_sid", opts.sid);
   const qs = params.toString();
   return qs ? `${CAL_BASE}?${qs}` : CAL_BASE;
 }
