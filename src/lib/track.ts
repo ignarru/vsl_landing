@@ -77,11 +77,15 @@ function uuid(): string {
   });
 }
 
-function get(storage: Storage, k: string): string | null {
-  try { return storage.getItem(k); } catch { return null; }
+/** ⚠️ El storage se resuelve DENTRO del try a propósito. Con las cookies bloqueadas, en algunos
+ *  navegadores (Safari/iOS estricto, Chrome con "bloquear todo") ni siquiera se puede LEER la
+ *  propiedad `localStorage`: tira SecurityError. Si se pasara el objeto por parámetro, esa
+ *  excepción saltaría en quien llama, fuera de este try. */
+function get(kind: "local" | "session", k: string): string | null {
+  try { return (kind === "local" ? localStorage : sessionStorage).getItem(k); } catch { return null; }
 }
-function set(storage: Storage, k: string, v: string): void {
-  try { storage.setItem(k, v); } catch { /* modo privado / storage bloqueado */ }
+function set(kind: "local" | "session", k: string, v: string): void {
+  try { (kind === "local" ? localStorage : sessionStorage).setItem(k, v); } catch { /* modo privado / storage bloqueado */ }
 }
 
 /** Mismo saneado que sanitizeUtm() de cal-link.ts, para que los valores sean comparables. */
@@ -144,22 +148,37 @@ function tickActividad(): void {
 /* ─── API pública (la usan los componentes) ─────────────────────────────────────────────── */
 
 /** ¿Este navegador pidió no ser medido? Do Not Track, Global Privacy Control, o la marca
- *  permanente que deja `?nt=1` (así las visitas propias de Ignacio no ensucian las métricas). */
+ *  permanente que deja `?nt=1` (así las visitas propias de Ignacio no ensucian las métricas).
+ *
+ *  ⚠️ "El visitante pidió que no lo midan" y "este navegador no me deja guardar nada" son cosas
+ *  DISTINTAS y se evalúan por separado. Antes iban en un solo try/catch que devolvía `true` ante
+ *  cualquier excepción: alguien con las cookies bloqueadas (iOS estricto, modo privado) quedaba
+ *  tratado como si hubiera activado DNT y se descartaba la visita entera — ni `view`, ni sid, ni
+ *  puente con cal.com. Caso real: la reunión del 03/08 llegó con los UTMs pero sin `lp_sid`, y
+ *  la visita no existía en la DB. No poder persistir NO es una señal de privacidad: el sid vive
+ *  igual en memoria mientras dure la pestaña, que es todo lo que necesita el puente. */
 function trackingDesactivado(): boolean {
+  // 1. Señales explícitas del visitante. Se respetan siempre.
   try {
     if (navigator.doNotTrack === "1" ||
         (window as unknown as { doNotTrack?: string }).doNotTrack === "1" ||
         (navigator as unknown as { globalPrivacyControl?: boolean }).globalPrivacyControl === true) {
       return true;
     }
+  } catch { /* no poder leerlas no es una señal — seguimos evaluando */ }
+
+  // 2. `?nt=1` en la URL: auto-exclusión de Ignacio. Vale para esta visita aunque el intento de
+  //    dejarla marcada para las próximas falle (set() ya es a prueba de storage bloqueado).
+  try {
     if (new URLSearchParams(window.location.search).get("nt") === "1") {
-      set(localStorage, KEY_NO_TRACK, "1");
+      set("local", KEY_NO_TRACK, "1");
       return true;
     }
-    return get(localStorage, KEY_NO_TRACK) === "1";
-  } catch {
-    return true; // ante la duda, no medimos
-  }
+  } catch { /* URL rara: no es una señal de nada */ }
+
+  // 3. La marca de una exclusión anterior. Si el storage no se puede leer devuelve null, que es
+  //    "no hay marca" — NO "pidió no ser medido".
+  return get("local", KEY_NO_TRACK) === "1";
 }
 
 /**
@@ -170,15 +189,24 @@ function trackingDesactivado(): boolean {
  * devolvería "" y el link se iría a cal.com sin el puente (bug real, visto en la verificación).
  *
  * Devuelve "" si el visitante pidió no ser medido — en ese caso el link queda igual que antes.
+ *
+ * Si el navegador no deja usar sessionStorage, el sid igual se genera y vive en memoria: dura lo
+ * que dura la pestaña, que es exactamente lo que necesita el puente visita → reunión. Lo único
+ * que se pierde es reusarlo si la persona recarga la página.
  */
 export function getSid(): string {
   if (typeof window === "undefined") return "";
-  if (trackingDesactivado()) return "";
-  if (!sid) {
-    sid = get(sessionStorage, KEY_SID) ?? "";
-    if (!sid) { sid = uuid(); set(sessionStorage, KEY_SID, sid); }
+  try {
+    if (trackingDesactivado()) return "";
+    if (!sid) {
+      sid = get("session", KEY_SID) ?? "";
+      if (!sid) { sid = uuid(); set("session", KEY_SID, sid); }
+    }
+    return sid;
+  } catch {
+    // Nunca romper el render del link a cal.com por el tracking.
+    return sid;
   }
-  return sid;
 }
 
 /** Registra un clic en un CTA. Se llama sola por delegación; se exporta por si algún
@@ -229,9 +257,11 @@ function arrancar(): void {
   if (!sid) return;
 
   // vid: solo para separar visitante nuevo de recurrente. Nunca se usa para atribuir fuente.
-  vid = get(localStorage, KEY_VID);
+  // Con el storage bloqueado siempre da null → esas visitas se cuentan como "nuevo visitante".
+  // Es una imprecisión aceptable: mejor eso que perder la visita completa.
+  vid = get("local", KEY_VID);
   const esNuevo = !vid;
-  if (!vid) { vid = uuid(); set(localStorage, KEY_VID, vid); }
+  if (!vid) { vid = uuid(); set("local", KEY_VID, vid); }
 
   const source = utm(url.get("utm_source"));
   const medium = utm(url.get("utm_medium"));
