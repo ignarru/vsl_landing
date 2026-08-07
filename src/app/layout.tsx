@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import Script from "next/script";
 import Tracker from "@/components/tracker";
+import { CTA_BOOT } from "@/lib/cta-boot";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -41,6 +42,10 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        {/* ⚡ Primero de todo: completa los links a cal.com (utm + lp_sid) sin esperar a que
+            hidrate React. El HTML estático los sirve pelados y un clic temprano perdía la
+            atribución Y el puente con /landing. Ver lib/cta-boot.ts. */}
+        <script dangerouslySetInnerHTML={{ __html: CTA_BOOT }} />
         {/* Bricolage Grotesque via Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

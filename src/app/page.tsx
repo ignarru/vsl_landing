@@ -99,9 +99,14 @@ export default function Home() {
   // dashboard saber qué visita generó esta reunión. El Tracker ya se montó desde el layout, así
   // que para cuando corre este efecto el sid existe; si el visitante tiene el tracking apagado
   // (?nt=1 o Do Not Track), getSid() devuelve "" y el link queda exactamente como antes.
+  // El script inline del <head> (lib/cta-boot.ts) ya resolvió esta misma URL antes de que
+  // hidratáramos, y con ella pintó los href. Reusarla —en vez de recalcularla— garantiza que el
+  // link no cambie entre "antes" y "después" de la hidratación: una sola verdad, un solo sid.
+  // buildCalUrl() queda de respaldo por si el snippet no llegó a correr.
   const [calUrl, setCalUrl] = useState(CAL_BASE);
   useEffect(() => {
-    setCalUrl(buildCalUrl({ sid: getSid() }));
+    const w = window as unknown as { __lpCalUrl?: string };
+    setCalUrl(w.__lpCalUrl || buildCalUrl({ sid: getSid() }));
   }, []);
 
   return (

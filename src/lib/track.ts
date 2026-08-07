@@ -199,8 +199,15 @@ export function getSid(): string {
   try {
     if (trackingDesactivado()) return "";
     if (!sid) {
-      sid = get("session", KEY_SID) ?? "";
+      // `__lpSid` lo deja el script inline del <head> (lib/cta-boot.ts), que corre ANTES que
+      // este módulo y ya lo pegó a los links de cal.com. Va primero a propósito: con el storage
+      // bloqueado sessionStorage devuelve null y generar otro sid acá partiría la sesión en dos
+      // —el booking viajaría con el sid del link y los eventos con otro— dejando la reunión sin
+      // recorrido y una sesión huérfana. La variable global no depende del storage.
+      const w = window as unknown as { __lpSid?: string };
+      sid = w.__lpSid || get("session", KEY_SID) || "";
       if (!sid) { sid = uuid(); set("session", KEY_SID, sid); }
+      w.__lpSid = sid;
     }
     return sid;
   } catch {
