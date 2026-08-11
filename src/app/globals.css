@@ -795,10 +795,11 @@ h1, h2, h3 {
 /* ─────────────────────────────────────────
    CÓMO — las 3 etapas
 ───────────────────────────────────────── */
+/* Sin fondo propio: un color distinto acá corta la grilla de construcción y la
+   página se ve parchada. Los bordes finos alcanzan para separar la sección. */
 .how-section {
   border-top: 1px solid var(--color-line);
   border-bottom: 1px solid var(--color-line);
-  background: var(--color-paper);
 }
 .how-inner { max-width: 1240px; margin: 0 auto; padding: 92px 40px; }
 
