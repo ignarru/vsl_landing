@@ -249,8 +249,8 @@ export default function Home() {
               Cuatro agujeros que se repiten en <span className="accent">casi todos los negocios</span>
             </div>
             <div className="sec-sub">
-              Esto no sale de un estudio. Sale de relevar más de cincuenta operaciones reales —
-              ferreterías, e-commerce, academias, distribuidoras, prestadores de servicio.
+              Esto no sale de un estudio. Sale de hablar con más de cincuenta dueños de negocio este
+              año — ferreterías, e-commerce, academias, distribuidoras, prestadores de servicio.
             </div>
           </div>
 
