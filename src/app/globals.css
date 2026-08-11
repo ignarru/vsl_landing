@@ -310,9 +310,12 @@ h1, h2, h3 {
   background: rgba(41,181,229,0.05);
 }
 
+/* 8vw hasta el tope: entre 560 y 1000px el hero es de UNA columna, así que el
+   titular puede ocupar todo el ancho y crecer. Con el clamp viejo (4.9vw) se
+   quedaba chico justo ahí, que es donde más tiene que pegar. */
 .h1 {
-  font-size: clamp(38px, 4.9vw, 64px);
-  margin-bottom: 24px;
+  font-size: clamp(36px, 8vw, 64px);
+  margin-bottom: 22px;
 }
 
 /* Remate del titular. Va más chico y en tinta secundaria a propósito: el golpe
@@ -1221,7 +1224,13 @@ input[type="range"]::-moz-range-thumb {
    RESPONSIVE
 ───────────────────────────────────────── */
 @media (max-width: 1000px) {
-  .hero { grid-template-columns: 1fr; gap: 46px; padding: 128px 24px 66px; }
+  /* Una columna: el titular manda y el resto se subordina. */
+  .hero { grid-template-columns: 1fr; gap: 40px; padding: 112px 24px 62px; }
+  .hero-tag { margin-bottom: 20px; }
+  .h1 { line-height: 0.95; letter-spacing: -0.035em; }
+  .h1-remate { margin-top: 16px; font-size: clamp(16px, 2.6vw, 20px); }
+  .hero-sub { font-size: 15.5px; line-height: 1.6; margin-bottom: 28px; max-width: 100%; }
+  .hero-ctas { width: 100%; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .pain-grid { grid-template-columns: 1fr; }
   .compare-grid { grid-template-columns: 1fr; }
@@ -1238,7 +1247,13 @@ input[type="range"]::-moz-range-thumb {
 @media (max-width: 560px) {
   .nav-bar { padding: 12px 20px; }
   .stats-grid { grid-template-columns: 1fr; }
-  .h1 { font-size: 33px; }
-  .btn-primary { width: 100%; justify-content: center; }
+  .hero { padding-top: 104px; }
+  .hero-sub { font-size: 15px; }
+  .btn-primary { width: 100%; justify-content: center; padding: 16px 22px; }
+  /* El informe achica su tipografía para que no compita con el titular */
+  .diagrama { padding: 20px 16px 16px; }
+  .proc-name { font-size: 12.5px; }
+  .proc-body { min-height: 0; }
+  .total-val { font-size: 25px; }
   .proc-head, .proc-row { grid-template-columns: 30px 1fr 54px 76px; gap: 8px; }
 }
