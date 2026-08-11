@@ -3,156 +3,144 @@
 import { useState, useEffect, useRef } from "react";
 import { trackCalculadora } from "@/lib/track";
 
-// Supuestos (punto medio: ni inflado ni tímido)
-const DAYS = 30; // días de operación al mes
-const CONVERSION = 0.08; // % de consultas no respondidas a tiempo que eran una venta real
-const RECOVERY = 0.7; // % de esa pérdida que recupera un agente de IA
+/* Supuestos, conservadores a propósito:
+   - 22 días hábiles y jornada de 8 h → 176 h/mes.
+   - Factor 1.45 sobre el sueldo: un empleado trabaja ~11 meses de los que le pagás
+     (aguinaldo, vacaciones, ausencias). Es la versión moderada del cálculo; la agresiva
+     multiplica por 3 contando cargas completas.
+   - 65 % automatizable: se deja afuera el criterio, la excepción y el trato humano. */
+const HORAS_MES = 176;
+const CARGAS = 1.45;
+const AUTOMATIZABLE = 0.65;
 
 const fmt = new Intl.NumberFormat("es-AR", {
   style: "currency",
-  currency: "ARS",
+  currency: "USD",
   maximumFractionDigits: 0,
 });
 
 function trackFill(value: number, min: number, max: number) {
   const pct = ((value - min) / (max - min)) * 100;
-  return `linear-gradient(90deg, #1e8fff 0%, #38bdf8 ${pct}%, var(--color-surface2) ${pct}%)`;
+  return `linear-gradient(90deg, #29b5e5 0%, #29b5e5 ${pct}%, rgba(41,181,229,0.12) ${pct}%)`;
 }
 
 export default function CostCalculator({ calUrl }: { calUrl: string }) {
-  const [msg, setMsg] = useState(50);
-  const [ticket, setTicket] = useState(50000);
-  const [pct, setPct] = useState(30);
+  const [personas, setPersonas] = useState(3);
+  const [horas, setHoras] = useState(4);
+  const [sueldo, setSueldo] = useState(700);
 
-  const loss = Math.round(msg * DAYS * (pct / 100) * CONVERSION * ticket);
-  const annual = loss * 12;
-  const recover = Math.round(loss * RECOVERY);
+  // Costo real de la hora, con el peso de las cargas incluido.
+  const costoHora = (sueldo * CARGAS) / HORAS_MES;
+  const mensual = Math.round(personas * horas * 22 * costoHora);
+  const anual = mensual * 12;
+  const recuperable = Math.round(mensual * AUTOMATIZABLE);
+  const horasMes = personas * horas * 22;
 
-  // Lo que el visitante declara sobre su propio negocio: volumen, ticket y cuánto pierde hoy.
-  // Es investigación de mercado gratis y, si después agenda, llega a la llamada pre-calificado.
-  // Debounce de 1s + skip del primer render: mover un slider al pasar no cuenta como "la usó",
-  // y sin el debounce cada pixel del slider sería un evento.
+  /* Lo que el visitante declara sobre su propio negocio. Es investigación de mercado gratis
+     y, si después agenda, llega a la llamada pre-calificado.
+     Debounce de 1 s + skip del primer render: mover un slider al pasar no cuenta como "la usó".
+     La firma de trackCalculadora se mantiene (4 números) para no tocar el contrato con el
+     dashboard; lo que cambió es qué mide cada uno: personas, sueldo, horas/día y costo mensual. */
   const primerRender = useRef(true);
   useEffect(() => {
     if (primerRender.current) { primerRender.current = false; return; }
-    const t = setTimeout(() => trackCalculadora(msg, ticket, pct, loss), 1000);
+    const t = setTimeout(() => trackCalculadora(personas, sueldo, horas, mensual), 1000);
     return () => clearTimeout(t);
-  }, [msg, ticket, pct, loss]);
+  }, [personas, sueldo, horas, mensual]);
 
   return (
     <section className="calc-section" id="calculadora">
       <div className="calc-grid">
-        {/* IZQUIERDA: título + sliders */}
+        {/* IZQUIERDA: sliders */}
         <div className="reveal">
-          <div className="sec-label">El costo real</div>
+          <div className="sec-label">El número que casi nadie tiene</div>
           <h2 className="sec-title">
-            Cuánto te cuesta <em className="grad-text">no tener IA</em> hoy
+            Cuánto te cuesta hoy el <span className="accent">trabajo repetitivo</span>
           </h2>
           <p className="sec-sub">
-            Mové los valores de tu negocio y mirá, en plata, lo que estás dejando sobre la mesa
-            cada mes.
+            No hace falta la auditoría para tener una idea. Movelo con tus números y mirá lo que
+            estás pagando por tareas que una máquina puede hacer.
           </p>
 
           <div className="slider-row">
             <div className="slider-head">
-              <span className="slider-label">Mensajes por día</span>
-              <span className="slider-value">{msg}</span>
+              <span className="slider-label">Personas que hacen tareas repetitivas</span>
+              <span className="slider-value">{personas}</span>
             </div>
             <input
               type="range"
-              min={10}
-              max={500}
-              step={5}
-              value={msg}
-              onChange={(e) => setMsg(+e.target.value)}
-              style={{ background: trackFill(msg, 10, 500) }}
-              aria-label="Mensajes por día"
+              min={1}
+              max={15}
+              step={1}
+              value={personas}
+              onChange={(e) => setPersonas(+e.target.value)}
+              style={{ background: trackFill(personas, 1, 15) }}
+              aria-label="Personas que hacen tareas repetitivas"
             />
           </div>
 
           <div className="slider-row">
             <div className="slider-head">
-              <span className="slider-label">Ticket promedio por venta</span>
-              <span className="slider-value">{fmt.format(ticket)}</span>
+              <span className="slider-label">Horas por día que le dedica cada una</span>
+              <span className="slider-value">{horas} h</span>
             </div>
             <input
               type="range"
-              min={5000}
-              max={300000}
-              step={5000}
-              value={ticket}
-              onChange={(e) => setTicket(+e.target.value)}
-              style={{ background: trackFill(ticket, 5000, 300000) }}
-              aria-label="Ticket promedio por venta"
+              min={1}
+              max={8}
+              step={1}
+              value={horas}
+              onChange={(e) => setHoras(+e.target.value)}
+              style={{ background: trackFill(horas, 1, 8) }}
+              aria-label="Horas por día"
             />
           </div>
 
           <div className="slider-row">
             <div className="slider-head">
-              <span className="slider-label">% de consultas que no respondés a tiempo</span>
-              <span className="slider-value">{pct}%</span>
+              <span className="slider-label">Lo que le pagás por mes a cada una</span>
+              <span className="slider-value">{fmt.format(sueldo)}</span>
             </div>
             <input
               type="range"
-              min={5}
-              max={80}
-              step={5}
-              value={pct}
-              onChange={(e) => setPct(+e.target.value)}
-              style={{ background: trackFill(pct, 5, 80) }}
-              aria-label="Porcentaje de consultas que no respondés a tiempo"
+              min={300}
+              max={2500}
+              step={50}
+              value={sueldo}
+              onChange={(e) => setSueldo(+e.target.value)}
+              style={{ background: trackFill(sueldo, 300, 2500) }}
+              aria-label="Sueldo mensual"
             />
+          </div>
+
+          <div className="cota" style={{ marginTop: 30 }}>
+            <span className="cota-val">{horasMes.toLocaleString("es-AR")} h por mes</span>
           </div>
         </div>
 
         {/* DERECHA: resultado */}
-        <div className="result-card reveal d1">
+        <div className="result-card framed reveal d1">
           <div className="res-label loss">
-            <svg
-              className="alert-ico alert-pulse"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
-            Perdés aprox. por mes
+            <span className="live-dot" />
+            Estás pagando por mes
           </div>
-          <div className="res-loss">{fmt.format(loss)}</div>
+          <div className="res-loss">{fmt.format(mensual)}</div>
           <div className="res-annual">
-            <svg
-              viewBox="0 0 24 24"
-              width="16"
-              height="16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <polyline points="19 12 12 19 5 12" />
-            </svg>
-            Son <b>{fmt.format(annual)}</b> al año que se te escapan
+            Son <b>{fmt.format(anual)}</b> al año en trabajo que se repite
           </div>
           <p className="res-loss-note">
-            Ventas que se van por no responder a tiempo, las 24 horas. Cada día que pasa es plata
-            que no vuelve.
+            Y esto es solo el costo directo. No cuenta las ventas que se pierden mientras esa
+            persona está ocupada haciendo otra cosa.
           </p>
 
           <div className="res-divider" />
 
           <div className="res-label recover">
-            <span className="dot" />
-            Recuperable con <b className="brand-inline">IAbyIA</b>
+            <span className="live-dot" />
+            Automatizable, siendo conservador
           </div>
           <div className="res-recover">
-            {fmt.format(recover)} <span>/ mes</span>
+            {fmt.format(recuperable)} <span>/ mes</span>
           </div>
 
           <a
@@ -162,16 +150,18 @@ export default function CostCalculator({ calUrl }: { calUrl: string }) {
             className="res-cta"
             data-cta="calculadora"
           >
-            Quiero recuperar esa plata →
+            Quiero saber cuál es mi número real
+            <span>→</span>
           </a>
         </div>
       </div>
 
       <p className="calc-fineprint">
-        * Estimación orientativa. Asumimos {DAYS} días de operación al mes y que el{" "}
-        <b>{Math.round(CONVERSION * 100)}%</b> de las consultas que no respondés a tiempo eran una
-        venta concretada. Con un agente de IA que responde al instante las 24 h, estimamos recuperar
-        hasta el <b>{Math.round(RECOVERY * 100)}%</b> de esas ventas.
+        * Estimación orientativa. Se asumen 22 días hábiles, jornada de 8 horas, y un factor de{" "}
+        <b>1,45</b> sobre el sueldo porque un empleado trabaja unos 11 meses de los 12 que le pagás
+        (aguinaldo, vacaciones y ausencias). Se considera automatizable el <b>65 %</b> de esas
+        horas: queda afuera todo lo que requiere criterio, excepción o trato humano. El número
+        exacto de tu caso sale de la auditoría, no de acá.
       </p>
     </section>
   );

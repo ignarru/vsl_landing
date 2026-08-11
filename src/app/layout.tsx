@@ -11,21 +11,21 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "IAbyIA",
+  title: "IAbyIA — Auditoría de operaciones con IA",
   description:
-    "Automatizá el 90% de tus consultas en WhatsApp con IA. Respondé al instante, vendé mientras dormís y recuperá tu inversión en 2-3 meses. Para negocios con +50 consultas diarias.",
+    "Te hago el mapa de cómo funciona tu negocio por dentro, cuánto te cuesta cada proceso en horas y en plata, y qué conviene automatizar primero. Después lo implemento. Para PyMEs de 5 a 50 personas.",
   keywords: [
-    "automatización whatsapp",
-    "chatbot inteligente",
-    "IA para negocios",
-    "atención al cliente 24/7",
-    "automatizar consultas",
+    "auditoría de procesos",
+    "automatización de procesos con IA",
+    "operaciones con inteligencia artificial",
+    "IA para PyMEs",
+    "automatizar tareas repetitivas",
     "IAbyIA",
   ],
   openGraph: {
-    title: "IAbyIA Automations",
+    title: "IAbyIA — Auditoría de operaciones con IA",
     description:
-      "Dejá de perder ventas por no responder a tiempo. IA que atiende, filtra y vende las 24 horas.",
+      "El problema no es que no le contestes. Es todo lo que pasa después. Te muestro dónde tu negocio pierde plata y horas, y cuánto vale cada agujero.",
     type: "website",
     locale: "es_AR",
   },
@@ -46,7 +46,8 @@ export default function RootLayout({
             hidrate React. El HTML estático los sirve pelados y un clic temprano perdía la
             atribución Y el puente con /landing. Ver lib/cta-boot.ts. */}
         <script dangerouslySetInnerHTML={{ __html: CTA_BOOT }} />
-        {/* Bricolage Grotesque via Google Fonts */}
+        {/* Archivo (display condensada, eje de ancho) + Martian Mono (rotulación técnica).
+            Las dos son variables: el CSS ajusta el ancho con font-variation-settings. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -54,7 +55,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Martian+Mono:wdth,wght@75..112.5,300..700&display=swap"
           rel="stylesheet"
         />
         {/* Google Analytics 4 */}

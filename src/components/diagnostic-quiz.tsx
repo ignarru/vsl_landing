@@ -12,30 +12,30 @@ type Step = { q: string; sub: string; opts: Opt[] };
 
 const STEPS: Step[] = [
   {
-    q: "¿Cuántos mensajes recibís por día?",
-    sub: "WhatsApp, Instagram, web — todo junto.",
+    q: "¿Cuánta gente hace tareas repetitivas todos los días?",
+    sub: "Cargar datos, responder lo mismo, coordinar, conciliar.",
     opts: [
-      { n: "A", t: "Menos de 30", score: 1, v: "menos_30" },
-      { n: "B", t: "Entre 30 y 100", score: 2, v: "30_100" },
-      { n: "C", t: "Más de 100", score: 3, v: "mas_100" },
+      { n: "A", t: "Nadie, lo hago yo solo", score: 1, v: "solo" },
+      { n: "B", t: "Una o dos personas", score: 2, v: "una_dos" },
+      { n: "C", t: "Tres o más", score: 3, v: "tres_mas" },
     ],
   },
   {
-    q: "¿Quién responde hoy esos mensajes?",
-    sub: "La realidad, sin filtro.",
+    q: "Al que consulta y no compra, ¿quién lo vuelve a contactar?",
+    sub: "La respuesta honesta, no la que debería ser.",
     opts: [
-      { n: "A", t: "Yo mismo, como puedo", score: 3, v: "yo" },
-      { n: "B", t: "Una o dos personas del equipo", score: 2, v: "equipo_chico" },
-      { n: "C", t: "Un equipo dedicado de atención", score: 1, v: "equipo_dedicado" },
+      { n: "A", t: "Nadie, se pierde", score: 3, v: "nadie" },
+      { n: "B", t: "Alguien, cuando se acuerda", score: 2, v: "a_veces" },
+      { n: "C", t: "Tenemos un proceso armado", score: 1, v: "proceso" },
     ],
   },
   {
-    q: "¿Qué te duele más hoy?",
-    sub: "Lo que más te quita el sueño.",
+    q: "¿Sabés cuánto te cuesta cada proceso de tu negocio?",
+    sub: "En horas y en plata, no por intuición.",
     opts: [
-      { n: "A", t: "Perder ventas fuera de horario", score: 3, v: "fuera_horario" },
-      { n: "B", t: "El tiempo que se va en responder lo mismo", score: 2, v: "tiempo_repetitivo" },
-      { n: "C", t: "No poder crecer sin contratar más gente", score: 2, v: "no_crecer" },
+      { n: "A", t: "Ni idea, nunca lo medí", score: 3, v: "ni_idea" },
+      { n: "B", t: "Más o menos, a ojo", score: 2, v: "a_ojo" },
+      { n: "C", t: "Sí, lo tengo medido", score: 1, v: "medido" },
     ],
   },
 ];
@@ -43,17 +43,17 @@ const STEPS: Step[] = [
 function resultFor(score: number) {
   if (score >= 7)
     return {
-      title: "Caso ideal para IA 🔥",
-      text: "Tu negocio recibe mucho volumen y está perdiendo ventas por no responder a tiempo. Es exactamente donde IAbyIA genera más impacto: podrías automatizar el 90% y recuperar ventas desde la primera semana.",
+      title: "Hay plata sobre la mesa",
+      text: "Tenés varias personas haciendo trabajo que se repite, nadie retoma al que no compró, y no sabés qué te cuesta cada cosa. Es exactamente el caso donde la auditoría se paga sola con el primer proceso que ordenamos.",
     };
   if (score >= 5)
     return {
-      title: "Gran oportunidad de automatizar",
-      text: "Tenés un volumen interesante y tareas repetitivas que la IA puede resolver sola. Con un buen diagnóstico identificamos qué automatizar primero para recuperar tiempo y ventas rápido.",
+      title: "Vale la pena medirlo",
+      text: "Hay material para trabajar. Lo que falta es el número: cuánto te cuesta hoy cada proceso y cuál conviene tocar primero. Eso sale de la auditoría, y con eso decidís con datos en vez de con intuición.",
     };
   return {
-    title: "Listo para dar el salto",
-    text: "Aún con poco volumen, automatizar te asegura no perder ninguna venta y crecer sin sumar gente. Te mostramos el plan más conveniente para tu etapa.",
+    title: "Puede que todavía no sea tu momento",
+    text: "Si trabajás solo y ya tenés medido lo que hacés, probablemente no necesites esto todavía — y prefiero decírtelo ahora que venderte algo que no te va a mover la aguja. Igual podemos hablar: si veo un caso claro, te lo digo, y si no, también.",
   };
 }
 
@@ -85,11 +85,12 @@ export default function DiagnosticQuiz({ calUrl }: { calUrl: string }) {
         <div className="sec-label" style={{ justifyContent: "center" }}>
           Diagnóstico en 30 segundos
         </div>
-        <div className="sec-title">
-          ¿Cuánto podés automatizar <em className="grad-text">tu negocio</em>?
+        <div className="sec-title" style={{ margin: "0 auto" }}>
+          ¿Tenés algo para <em className="grad-text">automatizar</em>?
         </div>
         <div className="sec-sub" style={{ margin: "14px auto 0" }}>
-          Respondé 3 preguntas y te decimos en el acto qué tan listo está tu negocio para vender con IA.
+          Tres preguntas y te digo en el acto si tiene sentido que hablemos. Si no lo tiene,
+          también te lo digo.
         </div>
       </div>
 
@@ -133,17 +134,11 @@ export default function DiagnosticQuiz({ calUrl }: { calUrl: string }) {
               style={{ marginLeft: "auto", marginRight: "auto" }}
               data-cta="quiz"
             >
-              Quiero mi plan personalizado <span aria-hidden="true">→</span>
+              Agendar la llamada <span aria-hidden="true">→</span>
             </a>
             <div className="guarantee">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" />
-                <polyline points="9 12 11 14 15 10" />
-              </svg>
-              <span>
-                Si en la llamada no vemos un caso claro para tu negocio, <b>te lo decimos</b>. No
-                vendemos humo.
-              </span>
+              La auditoría tiene devolución total: si al terminarla considerás que no te sirvió,
+              te devuelvo los USD 1.500 sin preguntas.
             </div>
           </div>
         )}
