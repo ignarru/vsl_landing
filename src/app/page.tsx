@@ -1,23 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AuditReport from "@/components/audit-report";
 import CostCalculator from "@/components/cost-calculator";
 import DiagnosticQuiz from "@/components/diagnostic-quiz";
 import MorphingText from "@/components/morphing-text";
 import ScrollEffects from "@/components/scroll-effects";
 import { CAL_BASE, buildCalUrl } from "@/lib/cal-link";
 import { getSid } from "@/lib/track";
-
-/* Procesos que aparecen en el informe del hero. Es un ejemplo genérico de PyME:
-   muestra el formato exacto del entregable de la auditoría. El costo va ANUAL
-   porque es el número que hace ruido; el semanal se lee como poca cosa. */
-const PROCESOS = [
-  { n: "01", name: "Responder las mismas consultas", horas: "12 h", costo: "$10.080", w: "76%" },
-  { n: "02", name: "Cargar pedidos a mano", horas: "8 h", costo: "$6.720", w: "52%" },
-  { n: "03", name: "Coordinar entregas y turnos", horas: "6 h", costo: "$5.040", w: "38%" },
-  { n: "04", name: "Conciliar pagos y cobranzas", horas: "5 h", costo: "$4.200", w: "32%" },
-  { n: "05", name: "Retomar a los que no compraron", horas: "0 h", costo: "sin medir", w: "4%", warn: true },
-];
 
 const TICKER_ITEMS = [
   "Presupuestos",
@@ -48,7 +38,7 @@ const ENTREGABLES = [
   {
     n: "03",
     title: "Dónde entra la IA",
-    desc: "Y dónde no conviene meterla, que es igual de importante y nadie te lo dice.",
+    desc: "Y dónde no conviene implementarla, que es igual de importante y nadie te lo dice.",
   },
   {
     n: "04",
@@ -213,47 +203,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* DIAGRAMA — el formato del entregable */}
-            <div className="diagrama framed reveal d2">
-              <div className="diagrama-head">
-                <span className="tech">Informe de auditoría · ejemplo</span>
-                <span className="pieza">REV·A</span>
-              </div>
-
-              {/* Encabezados: sin esto la tabla no se lee sola */}
-              <div className="proc-head">
-                <span>Tarea que se repite</span>
-                <span>Por semana</span>
-                <span>Te cuesta al año</span>
-              </div>
-
-              {PROCESOS.map((p) => (
-                <div className="proc-row" key={p.n}>
-                  <span className="pieza">{p.n}</span>
-                  <div>
-                    <div className="proc-name">{p.name}</div>
-                    <div className="proc-bar">
-                      <div
-                        className={`proc-fill${p.warn ? " warn" : ""}`}
-                        style={{ ["--w" as string]: p.w, animationDelay: `${0.4 + Number(p.n) * 0.12}s` }}
-                      />
-                    </div>
-                  </div>
-                  <div className="proc-nums">
-                    <div className="proc-horas">{p.horas}</div>
-                    <div className="proc-cost">{p.costo}</div>
-                  </div>
-                </div>
-              ))}
-
-              <div className="diagrama-total">
-                <span className="tech">Lo que se va por año</span>
-                <span className="total-val">$26.040</span>
-              </div>
-
-              <p className="nota" style={{ marginTop: 16 }}>
-                Así queda el informe. Con tus tareas y tus números.
-              </p>
+            {/* El informe se ejecuta solo — ver components/audit-report.tsx */}
+            <div className="reveal d2">
+              <AuditReport />
             </div>
           </div>
         </section>
@@ -324,7 +276,8 @@ export default function Home() {
           <div className="reveal">
             <div className="sec-label">La diferencia</div>
             <div className="sec-title">
-              De trabajar <span className="accent">en</span> el negocio a que el negocio trabaje solo
+              De trabajar en el negocio a que el negocio{" "}
+              <span className="accent">trabaje solo</span>
             </div>
           </div>
 
@@ -370,7 +323,7 @@ export default function Home() {
             <div className="tech" style={{ marginBottom: 14 }}>Lo que no vas a escuchar en otro lado</div>
             <p className="honesty-text">
               No te voy a decir que la inteligencia artificial resuelve todo. En la auditoría vas a
-              ver que hay procesos donde <strong>no conviene meterla</strong> — porque el volumen no
+              ver que hay procesos donde <strong>no conviene implementarla</strong> — porque el volumen no
               da, porque las reglas cambian todo el tiempo, o porque simplemente sale más caro que
               hacerlo a mano. Eso también te lo digo, y por escrito. Es la parte que nadie menciona
               cuando lo único que tiene para venderte es un bot.

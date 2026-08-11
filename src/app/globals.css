@@ -411,6 +411,69 @@ h1, h2, h3 {
   margin-bottom: 20px;
   border-bottom: 1px solid var(--color-line);
 }
+/* ── Informe que se ejecuta solo (components/audit-report.tsx) ── */
+.diagrama { overflow: hidden; }
+
+.scan-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-cyan), transparent);
+  box-shadow: 0 0 14px rgba(41,181,229,0.75);
+  animation: scan 1.1s cubic-bezier(.4,0,.6,1) infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+@keyframes scan {
+  0%   { top: 62px; opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { top: calc(100% - 40px); opacity: 0; }
+}
+
+.proc-body { min-height: 296px; } /* reserva el alto final: el bloque no salta al llenarse */
+
+.proc-scan {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 22px 2px;
+  font-family: 'Martian Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink3);
+}
+.proc-scan-dot {
+  width: 6px; height: 6px;
+  background: var(--color-cyan);
+  animation: pulse 1s infinite;
+}
+.puntos i {
+  font-style: normal;
+  opacity: 0;
+  animation: punto 1.2s infinite;
+}
+.puntos i:nth-child(2) { animation-delay: .2s; }
+.puntos i:nth-child(3) { animation-delay: .4s; }
+@keyframes punto { 0%, 60%, 100% { opacity: 0; } 30% { opacity: 1; } }
+
+.pieza.parpadea { animation: pulse 1s infinite; letter-spacing: 0.02em; }
+
+/* Cada fila entra sola cuando la auditoría "la encuentra" */
+.proc-row {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity .42s ease, transform .42s cubic-bezier(.2,.8,.2,1);
+}
+.proc-row.entra { opacity: 1; transform: none; }
+.proc-fill { transition: width .75s cubic-bezier(.2,.8,.2,1) .12s; }
+
+.diagrama-total { opacity: .35; transition: opacity .5s ease; }
+.diagrama-total.on { opacity: 1; }
+.informe-nota { opacity: 0; transition: opacity .6s ease; }
+.informe-nota.on { opacity: 1; }
+
 /* Encabezados de la tabla del informe. Sin ellos los números no se entienden. */
 .proc-head {
   display: grid;
@@ -454,14 +517,15 @@ h1, h2, h3 {
   background: rgba(41,181,229,0.1);
   overflow: hidden;
 }
+/* El ancho lo pone React (audit-report.tsx) cuando la fila entra — sin animación
+   CSS acá: una keyframe con `--w` peleaba con el estilo inline y todas las barras
+   terminaban al 100%. */
 .proc-fill {
   height: 100%;
   background: var(--color-cyan);
   width: 0;
-  animation: grow 1.3s cubic-bezier(.2,.8,.2,1) forwards;
 }
 .proc-fill.warn { background: var(--color-alert); }
-@keyframes grow { to { width: var(--w); } }
 .proc-cost {
   font-family: 'Martian Mono', monospace;
   font-size: 11.5px;
@@ -1147,9 +1211,10 @@ input[type="range"]::-moz-range-thumb {
 
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
-  .ticker-track, .live-dot, .proc-fill { animation: none; }
-  .proc-fill { width: var(--w); }
-  .h1 .strike::after { animation: none; transform: scaleX(1); }
+  .ticker-track, .live-dot, .scan-line, .proc-scan-dot, .puntos i { animation: none; }
+  .proc-row { opacity: 1; transform: none; transition: none; }
+  .proc-fill { transition: none; }
+  .morph-phrase { transition: none; }
 }
 
 /* ─────────────────────────────────────────
