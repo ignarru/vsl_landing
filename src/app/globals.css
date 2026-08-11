@@ -3,7 +3,7 @@
 /* ═══════════════════════════════════════════════════════════════
    IABYIA · SISTEMA VISUAL "CIANOTIPO"
    La página es el plano técnico del negocio del visitante.
-   Grilla de construcción, cotas, anotaciones al margen y cartucho.
+   Grilla de construcción, cotas, piezas numeradas y anotaciones al margen.
    ═══════════════════════════════════════════════════════════════ */
 
 @theme inline {
@@ -311,25 +311,29 @@ h1, h2, h3 {
 }
 
 .h1 {
-  font-size: clamp(40px, 5.4vw, 71px);
+  font-size: clamp(38px, 4.9vw, 64px);
   margin-bottom: 24px;
 }
-.h1 .strike {
-  position: relative;
-  color: var(--color-ink3);
-  white-space: nowrap;
+
+/* Frase que rota (components/morphing-text.tsx). Todas las frases ocupan LA MISMA
+   celda del grid: el contenedor mide lo que mide la más alta, en cualquier ancho,
+   sin alturas adivinadas en em ni elementos fantasma. Ojo: la frase con más
+   caracteres no es siempre la que toma más líneas — por eso el grid y no un ghost. */
+.morph-wrap {
+  display: grid;
+  color: var(--color-cyan);
 }
-.h1 .strike::after {
-  content: '';
-  position: absolute;
-  left: -2px; right: -2px; top: 52%;
-  height: 3px;
-  background: var(--color-alert);
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: strike 0.7s cubic-bezier(.6,.1,.2,1) 1.1s forwards;
+.morph-phrase {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(0.32em);
+  filter: blur(5px);
+  transition: opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1), filter .5s ease;
+  pointer-events: none;
+  text-wrap: balance;
 }
-@keyframes strike { to { transform: scaleX(1); } }
+.morph-phrase.active { opacity: 1; transform: none; filter: none; }
+.morph-phrase.exit { opacity: 0; transform: translateY(-0.3em); filter: blur(5px); }
 
 .hero-sub {
   font-size: 17px;
@@ -395,13 +399,40 @@ h1, h2, h3 {
   margin-bottom: 20px;
   border-bottom: 1px solid var(--color-line);
 }
+/* Encabezados de la tabla del informe. Sin ellos los números no se entienden. */
+.proc-head {
+  display: grid;
+  grid-template-columns: 34px 1fr 76px 92px;
+  gap: 13px;
+  padding-bottom: 9px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--color-line2);
+  font-family: 'Martian Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--color-ink3);
+}
+.proc-head span:first-child { grid-column: 2; }
+.proc-head span:nth-child(2) { text-align: right; }
+.proc-head span:nth-child(3) { text-align: right; }
+
 .proc-row {
   display: grid;
-  grid-template-columns: 34px 1fr auto;
+  grid-template-columns: 34px 1fr 76px 92px;
   gap: 13px;
   align-items: center;
   padding: 11px 0;
   border-bottom: 1px dashed rgba(41,181,229,0.13);
+}
+.proc-nums {
+  display: contents;
+}
+.proc-horas {
+  font-family: 'Martian Mono', monospace;
+  font-size: 11px;
+  color: var(--color-ink2);
+  text-align: right;
 }
 .proc-row:last-child { border-bottom: 0; }
 .proc-name { font-size: 13.5px; color: var(--color-ink); }
@@ -421,9 +452,11 @@ h1, h2, h3 {
 @keyframes grow { to { width: var(--w); } }
 .proc-cost {
   font-family: 'Martian Mono', monospace;
-  font-size: 11px;
+  font-size: 11.5px;
+  font-weight: 600;
   color: var(--color-alert);
   white-space: nowrap;
+  text-align: right;
 }
 .diagrama-total {
   display: flex;
@@ -771,39 +804,13 @@ h1, h2, h3 {
 .faq-item.open .faq-body { max-height: 340px; padding: 0 4px 24px; }
 
 /* ─────────────────────────────────────────
-   FOOTER — con cartucho de plano
+   FOOTER
 ───────────────────────────────────────── */
 footer {
   border-top: 1px solid var(--color-line2);
   padding: 54px 40px 34px;
   max-width: 1240px;
   margin: 0 auto;
-}
-.cartucho {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  border: 1px solid var(--color-line2);
-  margin-bottom: 30px;
-}
-.cartucho-cell {
-  padding: 15px 18px;
-  border-right: 1px solid var(--color-line);
-}
-.cartucho-cell:last-child { border-right: 0; }
-.cartucho-key {
-  font-family: 'Martian Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--color-ink3);
-  margin-bottom: 7px;
-}
-.cartucho-val {
-  font-family: 'Archivo', sans-serif;
-  font-variation-settings: 'wdth' 90;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-ink);
 }
 .footer-bottom {
   display: flex;
@@ -1124,7 +1131,6 @@ input[type="range"]::-moz-range-thumb {
   .pain-grid { grid-template-columns: 1fr; }
   .compare-grid { grid-template-columns: 1fr; }
   .steps-grid { grid-template-columns: 1fr; }
-  .cartucho { grid-template-columns: 1fr 1fr; }
   .calc-grid { grid-template-columns: 1fr; gap: 40px; }
   .nav-links { display: none; }
   .sec, .how-inner, .faq-section, .stats-section, .calc-section, .quiz-section {
@@ -1137,8 +1143,7 @@ input[type="range"]::-moz-range-thumb {
 @media (max-width: 560px) {
   .nav-bar { padding: 12px 20px; }
   .stats-grid { grid-template-columns: 1fr; }
-  .cartucho { grid-template-columns: 1fr; }
-  .cartucho-cell { border-right: 0; border-bottom: 1px solid var(--color-line); }
-  .h1 { font-size: 34px; }
+  .h1 { font-size: 33px; }
   .btn-primary { width: 100%; justify-content: center; }
+  .proc-head, .proc-row { grid-template-columns: 30px 1fr 54px 76px; gap: 8px; }
 }

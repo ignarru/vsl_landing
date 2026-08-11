@@ -2,11 +2,15 @@
 
 import { useEffect, useRef } from "react";
 
+/* Procesos distintos a propósito: la auditoría no es sobre conversaciones,
+   es sobre cualquier tarea repetitiva del negocio. */
 const PHRASES = [
-  "una venta perdida.",
-  "plata que se va.",
-  "un cliente menos.",
-  "tu mayor problema.",
+  "cargar pedidos a mano.",
+  "armar presupuestos uno por uno.",
+  "seguir a los que no compraron.",
+  "cruzar pagos en una planilla.",
+  "coordinar entregas por teléfono.",
+  "responder siempre lo mismo.",
 ];
 
 export default function MorphingText() {
@@ -42,6 +46,8 @@ export default function MorphingText() {
     return () => clearInterval(interval);
   }, []);
 
+  /* Las frases se apilan en la misma celda de grid (ver .morph-wrap en globals.css):
+     el alto del bloque lo fija sola la frase más alta y nunca salta al rotar. */
   return (
     <span className="morph-wrap" ref={wrapRef}>
       {PHRASES.map((p, i) => (

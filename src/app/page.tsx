@@ -3,18 +3,20 @@
 import { useEffect, useState } from "react";
 import CostCalculator from "@/components/cost-calculator";
 import DiagnosticQuiz from "@/components/diagnostic-quiz";
+import MorphingText from "@/components/morphing-text";
 import ScrollEffects from "@/components/scroll-effects";
 import { CAL_BASE, buildCalUrl } from "@/lib/cal-link";
 import { getSid } from "@/lib/track";
 
-/* Procesos que aparecen en el diagrama del hero. Es un ejemplo genérico de PyME:
-   muestra el formato exacto del entregable de la auditoría. */
+/* Procesos que aparecen en el informe del hero. Es un ejemplo genérico de PyME:
+   muestra el formato exacto del entregable de la auditoría. El costo va ANUAL
+   porque es el número que hace ruido; el semanal se lee como poca cosa. */
 const PROCESOS = [
-  { n: "01", name: "Responder las mismas consultas", horas: "12 h/sem", costo: "$840/mes", w: "76%" },
-  { n: "02", name: "Cargar pedidos a mano", horas: "8 h/sem", costo: "$560/mes", w: "52%" },
-  { n: "03", name: "Coordinar entregas y turnos", horas: "6 h/sem", costo: "$420/mes", w: "38%" },
-  { n: "04", name: "Conciliar pagos y cobranzas", horas: "5 h/sem", costo: "$350/mes", w: "32%" },
-  { n: "05", name: "Retomar al que no compró", horas: "0 h/sem", costo: "no se hace", w: "4%", warn: true },
+  { n: "01", name: "Responder las mismas consultas", horas: "12 h", costo: "$10.080", w: "76%" },
+  { n: "02", name: "Cargar pedidos a mano", horas: "8 h", costo: "$6.720", w: "52%" },
+  { n: "03", name: "Coordinar entregas y turnos", horas: "6 h", costo: "$5.040", w: "38%" },
+  { n: "04", name: "Conciliar pagos y cobranzas", horas: "5 h", costo: "$4.200", w: "32%" },
+  { n: "05", name: "Retomar a los que no compraron", horas: "0 h", costo: "sin medir", w: "4%", warn: true },
 ];
 
 const TICKER_ITEMS = [
@@ -68,7 +70,7 @@ const DOLORES = [
     title: "Coordinar a mano frena el crecimiento",
     body: "Agendar, rutear, confirmar, avisar. Cuando el volumen sube, el que coordina se convierte en el cuello de botella — y ahí se frena la venta, no la producción.",
     quote: "La cuestión no es meter más plata en publicidad, porque ya lo hicimos. No damos abasto.",
-    cite: "E-commerce · Capital Federal",
+    cite: "E-commerce · Uruguay",
   },
   {
     n: "03",
@@ -82,7 +84,7 @@ const DOLORES = [
     title: "Los datos desordenados frenan todo lo demás",
     body: "Catálogos con productos que ya no existen, precios en tres lugares distintos, stock que no coincide entre canales. Nada se puede automatizar arriba de eso.",
     quote: "De esos 14.000, uso 5.000. Es un laburo ponerme a eliminarlos uno por uno, entonces lo dejo.",
-    cite: "Ferretería, 2 sucursales · Tucumán",
+    cite: "Ferretería, 2 sucursales · Argentina",
   },
 ];
 
@@ -91,13 +93,13 @@ const ETAPAS = [
     n: "01",
     title: "La llamada",
     desc: "Miramos tu operación por arriba y vemos si tiene sentido avanzar. Si no lo tiene, te lo digo ahí mismo y no perdemos más tiempo ninguno de los dos.",
-    chips: ["45 minutos", "Sin costo"],
+    chips: ["Sin costo", "Sin compromiso"],
   },
   {
     n: "02",
     title: "La auditoría",
     desc: "Dos sesiones: con vos y con quien maneja el día a día. Salís con el mapa completo, el costo real de cada proceso y el presupuesto de cada solución.",
-    chips: ["2 semanas", "USD 1.500", "Se descuenta"],
+    chips: ["2 semanas", "Se descuenta del proyecto"],
     hi: true,
   },
   {
@@ -110,12 +112,12 @@ const ETAPAS = [
 
 const FAQS = [
   {
-    q: "¿Cuánto sale todo?",
-    a: "La auditoría son USD 1.500 y se descuenta del proyecto si avanzamos. La implementación depende de lo que salga del relevamiento: un proceso suele estar entre 2.500 y 4.000; varios procesos conectados, entre 5.000 y 8.000. No te puedo dar el número exacto antes de ver cómo trabajás por dentro, y prefiero decirte eso a inventarte una cifra.",
+    q: "¿Cómo se cotiza el trabajo?",
+    a: "Por etapas, y cada una con precio cerrado antes de arrancar. La auditoría tiene un valor fijo, porque el alcance es siempre el mismo. La implementación se cotiza recién cuando termina el relevamiento: antes de ver cómo trabajás por dentro, cualquier número que te dé sería inventado. Los valores concretos los vemos en la llamada, sin vueltas.",
   },
   {
     q: "¿Y si en mi negocio no hay nada para automatizar?",
-    a: "Puede pasar, y si es así te lo digo. Por eso la auditoría tiene devolución total: si terminada considerás que no te sirvió, te devuelvo los 1.500 sin preguntas. Lo que sí te puedo asegurar es que vas a salir sabiendo cuánto te cuesta cada proceso, que es información que hoy casi ninguna PyME tiene.",
+    a: "Puede pasar, y si es así te lo digo. Por eso la auditoría tiene devolución total: si al terminarla considerás que no te sirvió, te devuelvo lo que pagaste, sin preguntas. Lo que sí te puedo asegurar es que vas a salir sabiendo cuánto te cuesta cada proceso, que es información que hoy casi ninguna PyME tiene.",
   },
   {
     q: "¿Tengo que cambiar los sistemas que ya uso?",
@@ -127,7 +129,7 @@ const FAQS = [
   },
   {
     q: "¿Esto es un bot de WhatsApp?",
-    a: "Puede incluir uno, si de la auditoría sale que ese es tu cuello de botella. Pero en la mayoría de los negocios que releví el problema no era contestar más rápido: era todo lo que pasaba después de contestar. Por eso primero se mide y después se decide qué construir.",
+    a: "No. Un bot sigue un guion fijo y se rompe apenas alguien pregunta algo que no estaba previsto — por eso dan la sensación de estar hablando con una pared. Lo que se implementa es un agente de IA entrenado con la información real de tu negocio: entiende lo que le preguntan, responde con criterio, consulta tu stock o tus precios si hace falta, y deriva a una persona cuando el caso lo amerita. Dicho eso, la atención al cliente es solo uno de los procesos que puede salir de la auditoría. Si resulta que ahí está tu cuello de botella, lo implementamos; si está en la coordinación, en la cobranza o en el seguimiento, atacamos eso primero. Primero se mide, después se decide qué construir.",
   },
   {
     q: "¿Cuánto tardo en ver resultados?",
@@ -182,14 +184,12 @@ export default function Home() {
               </div>
 
               <h1 className="h1 reveal d1">
-                El problema no es que{" "}
-                <span className="strike">no le contestes</span>.
-                <br />
-                Es todo lo que pasa después.
+                Tu negocio pierde horas en
+                <MorphingText />
               </h1>
 
               <p className="hero-sub reveal d2">
-                Te hago el mapa de cómo funciona tu negocio por dentro, te digo{" "}
+                Te hago el mapa de cómo funciona por dentro, te digo{" "}
                 <strong>cuánto te cuesta cada proceso en horas y en plata</strong>, y qué conviene
                 automatizar primero. Después lo implemento.
               </p>
@@ -207,7 +207,7 @@ export default function Home() {
                 </a>
                 <div className="cta-note">
                   <span className="live-dot" />
-                  Llamada sin costo · 45 min · Los proyectos arrancan en USD 1.500
+                  Llamada sin costo · Sin compromiso
                 </div>
               </div>
             </div>
@@ -215,8 +215,15 @@ export default function Home() {
             {/* DIAGRAMA — el formato del entregable */}
             <div className="diagrama framed reveal d2">
               <div className="diagrama-head">
-                <span className="tech">Relevamiento · ejemplo</span>
+                <span className="tech">Informe de auditoría · ejemplo</span>
                 <span className="pieza">REV·A</span>
+              </div>
+
+              {/* Encabezados: sin esto la tabla no se lee sola */}
+              <div className="proc-head">
+                <span>Tarea que se repite</span>
+                <span>Por semana</span>
+                <span>Te cuesta al año</span>
               </div>
 
               {PROCESOS.map((p) => (
@@ -231,20 +238,20 @@ export default function Home() {
                       />
                     </div>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div className="tech" style={{ marginBottom: 3 }}>{p.horas}</div>
+                  <div className="proc-nums">
+                    <div className="proc-horas">{p.horas}</div>
                     <div className="proc-cost">{p.costo}</div>
                   </div>
                 </div>
               ))}
 
               <div className="diagrama-total">
-                <span className="tech">Costo anual del trabajo manual</span>
+                <span className="tech">Lo que se va por año</span>
                 <span className="total-val">$26.040</span>
               </div>
 
               <p className="nota" style={{ marginTop: 16 }}>
-                Así se ve el entregable. Con tus procesos y tus números.
+                Así queda el informe. Con tus tareas y tus números.
               </p>
             </div>
           </div>
@@ -457,27 +464,8 @@ export default function Home() {
         <DiagnosticQuiz calUrl={calUrl} />
       </main>
 
-      {/* FOOTER — cartucho de plano */}
+      {/* FOOTER */}
       <footer>
-        <div className="cartucho reveal">
-          <div className="cartucho-cell">
-            <div className="cartucho-key">Proyecto</div>
-            <div className="cartucho-val">Auditoría de operaciones con IA</div>
-          </div>
-          <div className="cartucho-cell">
-            <div className="cartucho-key">Escala</div>
-            <div className="cartucho-val">PyME · 5 a 50 personas</div>
-          </div>
-          <div className="cartucho-cell">
-            <div className="cartucho-key">Plazo</div>
-            <div className="cartucho-val">2 semanas</div>
-          </div>
-          <div className="cartucho-cell">
-            <div className="cartucho-key">Responsable</div>
-            <div className="cartucho-val">Ignacio Arruvito</div>
-          </div>
-        </div>
-
         <div className="footer-bottom">
           <a href="#" className="wordmark" style={{ fontSize: 16 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}

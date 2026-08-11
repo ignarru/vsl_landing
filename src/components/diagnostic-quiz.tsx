@@ -138,7 +138,7 @@ export default function DiagnosticQuiz({ calUrl }: { calUrl: string }) {
             </a>
             <div className="guarantee">
               La auditoría tiene devolución total: si al terminarla considerás que no te sirvió,
-              te devuelvo los USD 1.500 sin preguntas.
+              te devuelvo lo que pagaste, sin preguntas.
             </div>
           </div>
         )}
