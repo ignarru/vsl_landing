@@ -98,8 +98,8 @@ const ETAPAS = [
   {
     n: "02",
     title: "La auditoría",
-    desc: "Dos sesiones: con vos y con quien maneja el día a día. Salís con el mapa completo, el costo real de cada proceso y el presupuesto de cada solución.",
-    chips: ["2 semanas", "Se descuenta del proyecto"],
+    desc: "Dos sesiones: con vos y con quien maneja el día a día. Salís con el mapa completo, el costo real de cada proceso y el presupuesto de cada solución. Si después avanzamos, lo que pagaste acá se descuenta.",
+    chips: ["2 semanas", "Se descuenta"],
     hi: true,
   },
   {
@@ -113,7 +113,7 @@ const ETAPAS = [
 const FAQS = [
   {
     q: "¿Cómo se cotiza el trabajo?",
-    a: "Por etapas, y cada una con precio cerrado antes de arrancar. La auditoría tiene un valor fijo, porque el alcance es siempre el mismo. La implementación se cotiza recién cuando termina el relevamiento: antes de ver cómo trabajás por dentro, cualquier número que te dé sería inventado. Los valores concretos los vemos en la llamada, sin vueltas.",
+    a: "Por etapas, y cada una con precio cerrado antes de arrancar. La auditoría tiene un valor fijo, porque el alcance es siempre el mismo. La implementación se cotiza recién cuando terminamos de revisar cómo trabajás: antes de ver tu negocio por dentro, cualquier número que te dé sería inventado. Los valores concretos los vemos en la llamada, sin vueltas.",
   },
   {
     q: "¿Y si en mi negocio no hay nada para automatizar?",
@@ -184,14 +184,15 @@ export default function Home() {
               </div>
 
               <h1 className="h1 reveal d1">
-                Tu negocio pierde horas en
+                Tu negocio pierde plata en
                 <MorphingText />
+                <span className="h1-remate">Y todavía no sabés cuánta.</span>
               </h1>
 
               <p className="hero-sub reveal d2">
-                Te hago el mapa de cómo funciona por dentro, te digo{" "}
-                <strong>cuánto te cuesta cada proceso en horas y en plata</strong>, y qué conviene
-                automatizar primero. Después lo implemento.
+                No son solo horas: es plata que se va todos los meses. Te hago el mapa de cómo
+                funciona tu negocio por dentro, <strong>le pongo número a cada proceso</strong> y
+                te digo qué conviene automatizar primero. Después lo implemento.
               </p>
 
               <div className="hero-ctas reveal d3">
