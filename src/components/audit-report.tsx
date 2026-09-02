@@ -5,7 +5,10 @@ import { useEffect, useRef, useState } from "react";
 /* Informe de auditoría que se "ejecuta" solo: las tareas aparecen una por una,
    se miden, el costo cuenta hacia arriba y al final se suma el total. La idea es
    que el visitante VEA pasar lo que le estamos prometiendo, en vez de leer una
-   tabla quieta. Cuando termina, espera y vuelve a empezar. */
+   tabla quieta. Cuando termina, espera y vuelve a empezar.
+
+   El loop corre SOLO mientras el informe está en pantalla y la pestaña visible: fuera
+   de eso se muestra completo y quieto (antes seguía disparando timers para nadie). */
 
 type Proceso = {
   n: string;
@@ -44,7 +47,7 @@ function useContador(valor: number, activo: boolean, duracion = 700) {
     const t0 = performance.now();
     const tick = (t: number) => {
       const p = Math.min((t - t0) / duracion, 1);
-      // easeOutкняж — desacelera al final para que el número "aterrice"
+      // ease-out cúbico — desacelera al final para que el número "aterrice"
       setN(Math.round(valor * (1 - Math.pow(1 - p, 3))));
       if (p < 1) raf = requestAnimationFrame(tick);
     };
@@ -80,6 +83,7 @@ export default function AuditReport() {
   // -1 = escaneando · 0..4 = tareas apareciendo · 5 = total · 6 = completo
   const [paso, setPaso] = useState(-1);
   const timers = useRef<number[]>([]);
+  const raiz = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const reduce =
@@ -88,9 +92,18 @@ export default function AuditReport() {
 
     if (reduce) { setPaso(6); return; } // sin animación: informe completo de una
 
-    const correr = () => {
+    let enPantalla = false;
+    let pestanaVisible = document.visibilityState === "visible";
+    let corriendo = false;
+
+    const limpiar = () => {
       timers.current.forEach(clearTimeout);
       timers.current = [];
+    };
+
+    const correr = () => {
+      limpiar();
+      corriendo = true;
       setPaso(-1);
 
       PROCESOS.forEach((_, i) => {
@@ -107,8 +120,26 @@ export default function AuditReport() {
       );
     };
 
-    correr();
-    return () => timers.current.forEach(clearTimeout);
+    // Corre solo cuando alguien puede verlo; si no, queda completo y quieto.
+    const evaluar = () => {
+      const debe = enPantalla && pestanaVisible;
+      if (debe && !corriendo) correr();
+      if (!debe && corriendo) { limpiar(); corriendo = false; setPaso(6); }
+    };
+
+    const io = new IntersectionObserver(
+      (entradas) => { enPantalla = entradas.some((e) => e.isIntersecting); evaluar(); },
+      { threshold: 0.2 }
+    );
+    if (raiz.current) io.observe(raiz.current);
+    const onVisibilidad = () => { pestanaVisible = document.visibilityState === "visible"; evaluar(); };
+    document.addEventListener("visibilitychange", onVisibilidad);
+
+    return () => {
+      limpiar();
+      io.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilidad);
+    };
   }, []);
 
   const escaneando = paso === -1;
@@ -116,11 +147,11 @@ export default function AuditReport() {
   const total = useContador(TOTAL, totalVisible, 900);
 
   return (
-    <div className="diagrama framed">
+    <div className="diagrama framed" ref={raiz}>
       <div className="diagrama-head">
         <span className="tech">Informe de auditoría · ejemplo</span>
         <span className={`pieza${escaneando ? " parpadea" : ""}`}>
-          {escaneando ? "•••" : "REV·A"}
+          {escaneando ? "•••" : "REV·B"}
         </span>
       </div>
 

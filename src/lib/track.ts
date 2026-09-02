@@ -30,13 +30,14 @@ const KEY_NO_TRACK = "iabyia_no_track";
  *  Se mapea por selector para no tener que ensuciar page.tsx con ids nuevos. */
 const SECCIONES: [string, string][] = [
   ["hero", ".hero"],
+  ["quien", "#quien"],
   ["stats", ".stats-section"],
+  ["como", "#como"],
   ["calculadora", "#calculadora"],
   ["dolor", "#dolor"],
   ["transformacion", ".transform-section"],
-  ["como", "#como"],
+  ["para-quien", "#para-quien"],
   ["faq", "#faq"],
-  ["diagnostico", "#diagnostico"],
   ["footer", "footer"],
 ];
 
@@ -340,7 +341,7 @@ function arrancar(): void {
         const item = faq.closest(".faq-item");
         const i = item?.parentElement ? [...item.parentElement.children].indexOf(item) : -1;
         st.faq++;
-        track("faq_open", { i });
+        track("faq_open", { i, id: faq.getAttribute("data-faq-id") || undefined });
       }
     } catch { /* noop */ }
   }, true);

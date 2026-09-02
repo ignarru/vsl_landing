@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /* Procesos distintos a propósito: la auditoría no es sobre conversaciones,
    es sobre cualquier tarea repetitiva del negocio. */
@@ -13,45 +13,53 @@ const PHRASES = [
   "responder siempre lo mismo.",
 ];
 
+const CADA = 2800;
+
 export default function MorphingText() {
-  const wrapRef = useRef<HTMLSpanElement>(null);
+  const [idx, setIdx] = useState(0);
+  const [saliendo, setSaliendo] = useState<number | null>(null);
   const idxRef = useRef(0);
 
   useEffect(() => {
-    const wrap = wrapRef.current;
-    if (!wrap) return;
+    // Con reduced-motion la frase se queda quieta: rotar sin transición es solo ruido.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const interval = window.setInterval(() => {
-      const phrases = wrap.querySelectorAll<HTMLSpanElement>(".morph-phrase");
-      if (!phrases.length) return;
+    let intervalo: number | null = null;
+    let limpieza = 0;
 
-      const current = phrases[idxRef.current];
-      idxRef.current = (idxRef.current + 1) % phrases.length;
-      const next = phrases[idxRef.current];
+    const paso = () => {
+      const actual = idxRef.current;
+      const siguiente = (actual + 1) % PHRASES.length;
+      idxRef.current = siguiente;
+      setSaliendo(actual);
+      setIdx(siguiente);
+      clearTimeout(limpieza);
+      limpieza = window.setTimeout(() => setSaliendo(null), 600);
+    };
+    // Se pausa con la pestaña oculta: nadie mira y el timer no tiene por qué seguir.
+    const arrancar = () => { if (intervalo === null) intervalo = window.setInterval(paso, CADA); };
+    const parar = () => { if (intervalo !== null) { clearInterval(intervalo); intervalo = null; } };
+    const onVisibilidad = () => (document.visibilityState === "visible" ? arrancar() : parar());
 
-      current.classList.remove("active");
-      current.classList.add("exit");
-      next.classList.remove("exit");
-      // small delay to let exit animate before next enters
-      window.setTimeout(() => {
-        next.classList.add("active");
-      }, 60);
-
-      // clean exit class after transition
-      window.setTimeout(() => {
-        current.classList.remove("exit");
-      }, 600);
-    }, 2800);
-
-    return () => clearInterval(interval);
+    document.addEventListener("visibilitychange", onVisibilidad);
+    if (document.visibilityState === "visible") arrancar();
+    return () => {
+      parar();
+      clearTimeout(limpieza);
+      document.removeEventListener("visibilitychange", onVisibilidad);
+    };
   }, []);
 
   /* Las frases se apilan en la misma celda de grid (ver .morph-wrap en globals.css):
      el alto del bloque lo fija sola la frase más alta y nunca salta al rotar. */
   return (
-    <span className="morph-wrap" ref={wrapRef}>
+    <span className="morph-wrap">
       {PHRASES.map((p, i) => (
-        <span key={p} className={`morph-phrase ${i === 0 ? "active" : ""}`}>
+        <span
+          key={p}
+          className={`morph-phrase${i === idx ? " active" : ""}${i === saliendo ? " exit" : ""}`}
+          aria-hidden={i !== idx}
+        >
           {p}
         </span>
       ))}

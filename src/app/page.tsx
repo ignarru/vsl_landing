@@ -1,55 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 import AuditReport from "@/components/audit-report";
 import CostCalculator from "@/components/cost-calculator";
-import DiagnosticQuiz from "@/components/diagnostic-quiz";
 import MorphingText from "@/components/morphing-text";
 import ScrollEffects from "@/components/scroll-effects";
+import Wordmark from "@/components/wordmark";
+import Quien from "@/components/quien";
+import ParaQuien from "@/components/para-quien";
+import { PaginaInforme, type PaginaId } from "@/components/informe-paginas";
+import { Pictograma, type PictogramaId } from "@/components/pictogramas";
+import { FAQS } from "@/lib/faqs";
 import { CAL_BASE, buildCalUrl } from "@/lib/cal-link";
 import { getSid } from "@/lib/track";
 
-const TICKER_ITEMS = [
-  "Presupuestos",
-  "Seguimiento de clientes",
-  "Facturación",
-  "Coordinación de entregas",
-  "Cobranzas",
-  "Carga de pedidos",
-  "Turnos y agenda",
-  "Control de stock",
-  "Reportes",
-  "Recompra",
-  "Altas de productos",
-  "Atención de consultas",
-];
+/* Numeración de hojas del plano: 01 hero · 02 quién · 03 qué te llevás · 04 proceso ·
+   05 calculadora · 06 agujeros · 07 diferencia · 08 ¿es para vos? · 09 preguntas */
+const HOJAS = "09";
 
-const ENTREGABLES = [
+const ENTREGABLES: { n: string; pagina: PaginaId; title: string; desc: string }[] = [
   {
     n: "01",
+    pagina: "mapa",
     title: "El mapa de tus procesos",
     desc: "Cómo se hace hoy cada cosa, quién la hace y cuánto tarda. Escrito, no de memoria.",
   },
   {
     n: "02",
+    pagina: "costos",
     title: "Cuánto te cuesta cada uno",
     desc: "En horas y en plata al año, calculado con tus números reales. No con promedios del sector.",
   },
   {
     n: "03",
+    pagina: "ia",
     title: "Dónde entra la IA",
     desc: "Y dónde no conviene implementarla, que es igual de importante y nadie te lo dice.",
   },
   {
     n: "04",
+    pagina: "plan",
     title: "El plan, ordenado por retorno",
     desc: "Qué hacer primero, qué después, y cuánto sale cada cosa. Para que decidas con números.",
   },
 ];
 
-const DOLORES = [
+const DOLORES: { n: string; icono: PictogramaId; title: string; body: string; quote: string; cite: string }[] = [
   {
     n: "01",
+    icono: "seguimiento",
     title: "Al que no compró, nadie lo vuelve a llamar",
     body: "Entran consultas todos los días. Un porcentaje compra en el momento. El resto queda en un chat y no lo retoma nadie, porque no hay proceso: depende de que alguien se acuerde.",
     quote: "Ella una vez que no le responde, no le vuelve a hacer seguimiento. Esa es una realidad. Lo deja morir.",
@@ -57,6 +56,7 @@ const DOLORES = [
   },
   {
     n: "02",
+    icono: "coordinar",
     title: "Coordinar a mano frena el crecimiento",
     body: "Agendar, rutear, confirmar, avisar. Cuando el volumen sube, el que coordina se convierte en el cuello de botella — y ahí se frena la venta, no la producción.",
     quote: "La cuestión no es meter más plata en publicidad, porque ya lo hicimos. No damos abasto.",
@@ -64,6 +64,7 @@ const DOLORES = [
   },
   {
     n: "03",
+    icono: "cobranza",
     title: "La plata que entra se controla a ojo",
     body: "Transferencias que se revisan una por una, pagos que se cruzan en una planilla, clientes que quedan debiendo sin que nadie lo note hasta fin de mes.",
     quote: "Una transferencia puede ser clonada, y ahora estamos revisando transferencia por transferencia. Es un tema lento.",
@@ -71,6 +72,7 @@ const DOLORES = [
   },
   {
     n: "04",
+    icono: "datos",
     title: "Los datos desordenados frenan todo lo demás",
     body: "Catálogos con productos que ya no existen, precios en tres lugares distintos, stock que no coincide entre canales. Nada se puede automatizar arriba de eso.",
     quote: "De esos 14.000, uso 5.000. Es un laburo ponerme a eliminarlos uno por uno, entonces lo dejo.",
@@ -78,54 +80,69 @@ const DOLORES = [
   },
 ];
 
-const ETAPAS = [
+const ETAPAS: {
+  n: string; title: string; cota: string; desc: string; extra?: string; garantia?: string; chips: string[]; hi?: boolean;
+}[] = [
   {
     n: "01",
     title: "La llamada",
+    cota: "1 llamada · sin costo",
     desc: "Miramos tu operación por arriba y vemos si tiene sentido avanzar. Si no lo tiene, te lo digo ahí mismo y no perdemos más tiempo ninguno de los dos.",
+    extra: "Traé tres números, aunque sean aproximados: consultas por mes, cuántas compran y cuánto te deja un cliente. Con eso alcanza.",
     chips: ["Sin costo", "Sin compromiso"],
   },
   {
     n: "02",
     title: "La auditoría",
+    cota: "2 semanas",
     desc: "Dos sesiones: con vos y con quien maneja el día a día. Salís con el mapa completo, el costo real de cada proceso y el presupuesto de cada solución. Si después avanzamos, lo que pagaste acá se descuenta.",
-    chips: ["2 semanas", "Se descuenta"],
+    garantia: "Si al terminar considerás que no te sirvió, te la devuelvo. Sin preguntas.",
+    chips: ["2 semanas", "Se descuenta", "Con garantía"],
     hi: true,
   },
   {
     n: "03",
     title: "La implementación",
+    cota: "por etapas, en marcha",
     desc: "Con el plan en la mano elegís: lo implemento yo, o le enseño a alguien de tu equipo a hacerlo. Según lo que te convenga y qué tan adentro querés la capacidad.",
     chips: ["Lo hago yo", "o te enseño"],
   },
 ];
 
-const FAQS = [
-  {
-    q: "¿Cómo se cotiza el trabajo?",
-    a: "Por etapas, y cada una con precio cerrado antes de arrancar. La auditoría tiene un valor fijo, porque el alcance es siempre el mismo. La implementación se cotiza recién cuando terminamos de revisar cómo trabajás: antes de ver tu negocio por dentro, cualquier número que te dé sería inventado. Los valores concretos los vemos en la llamada, sin vueltas.",
-  },
-  {
-    q: "¿Y si en mi negocio no hay nada para automatizar?",
-    a: "Puede pasar, y si es así te lo digo. Por eso la auditoría tiene devolución total: si al terminarla considerás que no te sirvió, te devuelvo lo que pagaste, sin preguntas. Lo que sí te puedo asegurar es que vas a salir sabiendo cuánto te cuesta cada proceso, que es información que hoy casi ninguna PyME tiene.",
-  },
-  {
-    q: "¿Tengo que cambiar los sistemas que ya uso?",
-    a: "No. El trabajo se hace arriba de lo que ya tenés: WhatsApp, tu sistema de gestión, tu e-commerce, planillas, lo que sea. Cambiar todo de golpe es la forma más cara y más lenta de hacer esto.",
-  },
-  {
-    q: "¿Mi equipo tiene que saber de tecnología?",
-    a: "No. Si elegís que lo implemente yo, queda funcionando y tu equipo solo usa el resultado. Si elegís aprender a hacerlo adentro, se lo enseño a la persona que vos elijas, sobre tus propios procesos y no en abstracto.",
-  },
-  {
-    q: "¿Esto es un bot de WhatsApp?",
-    a: "No. Un bot sigue un guion fijo y se rompe apenas alguien pregunta algo que no estaba previsto — por eso dan la sensación de estar hablando con una pared. Lo que se implementa es un agente de IA entrenado con la información real de tu negocio: entiende lo que le preguntan, responde con criterio, consulta tu stock o tus precios si hace falta, y deriva a una persona cuando el caso lo amerita. Dicho eso, la atención al cliente es solo uno de los procesos que puede salir de la auditoría. Si resulta que ahí está tu cuello de botella, lo implementamos; si está en la coordinación, en la cobranza o en el seguimiento, atacamos eso primero. Primero se mide, después se decide qué construir.",
-  },
-  {
-    q: "¿Cuánto tardo en ver resultados?",
-    a: "La auditoría son dos semanas y ahí ya tenés los números sobre la mesa. La implementación depende del alcance, pero se arma por etapas: la primera siempre es la de mayor retorno y menor complejidad, para que el sistema empiece a devolver antes de estar terminado.",
-  },
+/* Cada fila es un par hoy → después: la tabla se lee de a una, no de a columna. */
+const COMPARACION: [string, string][] = [
+  ["Cada proceso depende de que alguien se acuerde de hacerlo", "Cada proceso corre solo, con reglas escritas y auditables"],
+  ["Nadie sabe cuánto cuesta realmente atender un pedido", "Sabés qué te cuesta cada operación y cuánto deja"],
+  ["Para crecer hay que contratar, con todo lo que eso implica", "El volumen sube sin que suba la nómina"],
+  ["Los clientes que no compraron quedan en un chat, sin volver", "Al que no compró se lo retoma sin que nadie lo recuerde"],
+  ["Cuando falta la persona que sabe, se frena todo", "El conocimiento queda en el sistema, no en una persona"],
 ];
+
+const REDES = [
+  { n: "YouTube", u: "https://www.youtube.com/@ignacio.arruvito" },
+  { n: "Instagram", u: "https://www.instagram.com/ignacioarruvito" },
+  { n: "TikTok", u: "https://www.tiktok.com/@ignacioarruvito11" },
+  { n: "LinkedIn", u: "https://www.linkedin.com/in/ignacio-arruvito-485562340" },
+];
+
+/** Cabecera de sección: etiqueta, título, bajada, y al margen el número de hoja y una nota. */
+function SecHead({
+  hoja, label, title, sub, nota,
+}: { hoja: string; label: string; title: ReactNode; sub?: ReactNode; nota?: string }) {
+  return (
+    <div className="sec-head">
+      <div className="sec-head-main">
+        <div className="sec-label">{label}</div>
+        <h2 className="sec-title">{title}</h2>
+        {sub && <p className="sec-sub">{sub}</p>}
+      </div>
+      <div className="sec-head-side">
+        <span className="hoja">Hoja {hoja} / {HOJAS}</span>
+        {nota && <p className="nota nota-margen">{nota}</p>}
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   // Link a cal.com con la atribución del visitante (utm + lp_sid).
@@ -138,17 +155,18 @@ export default function Home() {
     setCalUrl(w.__lpCalUrl || buildCalUrl({ sid: getSid() }));
   }, []);
 
+  // El acordeón vive en estado: así `aria-expanded` dice la verdad (antes era un string fijo).
+  const [faqAbierta, setFaqAbierta] = useState<number | null>(null);
+
   return (
     <>
       <ScrollEffects />
-      <div className="scroll-bar" id="scrollBar" />
+      <div className="scroll-bar" id="scrollBar" aria-hidden="true" />
 
-      {/* NAV */}
-      <nav className="nav-bar">
-        <a href="#" className="wordmark">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/logo-icon-transparent.png" alt="IAbyIA" width={26} height={26} className="wm-icon" />
-          <span>IAbyIA</span>
+      {/* NAV — el CTA de acá produce 13 de cada 16 reservas: no se toca */}
+      <nav className="nav-bar" aria-label="Principal">
+        <a href="/" className="wordmark">
+          <Wordmark />
         </a>
         <div className="nav-links">
           <a href="#dolor" className="nav-link">El problema</a>
@@ -159,33 +177,38 @@ export default function Home() {
         <a href={calUrl} target="_blank" rel="noopener noreferrer" className="nav-cta" data-cta="nav">
           <span className="live-dot" />
           Agendar llamada
-          <span className="nav-cta-arrow">→</span>
+          <span className="nav-cta-arrow" aria-hidden="true">→</span>
         </a>
       </nav>
 
-      <main>
-        {/* HERO */}
-        <section>
+      <main id="contenido">
+        {/* HERO — sin .reveal a propósito: es el LCP y se pinta de una */}
+        <section aria-label="Presentación">
           <div className="hero">
             <div className="hero-left">
-              <div className="hero-tag reveal">
+              <div className="hero-tag">
                 <span className="live-dot" />
                 Auditoría de operaciones con IA
               </div>
 
-              <h1 className="h1 reveal d1">
-                Tu negocio pierde plata en
-                <MorphingText />
-                <span className="h1-remate">Y todavía no sabés cuánta.</span>
+              <h1 className="h1">
+                <span className="sr-only">Tu negocio pierde plata en tareas que se hacen a mano.</span>
+                <span aria-hidden="true" style={{ display: "block" }}>
+                  Tu negocio pierde plata en
+                  <MorphingText />
+                </span>
               </h1>
+              <p className="h1-remate">Y todavía no sabés cuánta.</p>
 
-              <p className="hero-sub reveal d2">
+              <p className="hero-sub">
                 No son solo horas: es plata que se va todos los meses. Te hago el mapa de cómo
                 funciona tu negocio por dentro, <strong>le pongo número a cada proceso</strong> y
                 te digo qué conviene automatizar primero. Después lo implemento.
               </p>
 
-              <div className="hero-ctas reveal d3">
+              {/* El botón dice lo que hace. El anterior ("Ver cuánto estoy perdiendo") mandaba a
+                  cal.com: 25 clics y ninguna reserva. Calcular es el link secundario, y baja. */}
+              <div className="hero-ctas">
                 <a
                   href={calUrl}
                   target="_blank"
@@ -193,162 +216,93 @@ export default function Home() {
                   className="btn-primary"
                   data-cta="hero"
                 >
-                  Ver cuánto estoy perdiendo
-                  <span>→</span>
+                  Agendar la llamada
+                  <span aria-hidden="true">→</span>
                 </a>
-                <div className="cta-note">
-                  <span className="live-dot" />
-                  Llamada sin costo · Sin compromiso
-                </div>
+                <a href="#calculadora" className="btn-ghost">
+                  Calculá cuánto perdés
+                  <span aria-hidden="true">↓</span>
+                </a>
+              </div>
+              <div className="cta-note">
+                <span className="live-dot" />
+                Sin costo · Sin compromiso · Si no aplica, te lo digo ahí
               </div>
             </div>
 
             {/* El informe se ejecuta solo — ver components/audit-report.tsx */}
-            <div className="reveal d2">
+            <div className="hero-right">
               <AuditReport />
             </div>
           </div>
-        </section>
 
-        {/* TICKER — procesos, no tecnologías */}
-        <div className="ticker-wrap">
-          <div className="ticker-track">
-            {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
-              <span key={`${item}-${i}`} className="ticker-item">{item}</span>
-            ))}
-          </div>
-        </div>
-
-        {/* ENTREGABLES */}
-        <div className="stats-section">
-          <div className="reveal" style={{ marginBottom: 34 }}>
-            <div className="sec-label">Qué te llevás</div>
-            <div className="sec-title" style={{ fontSize: "clamp(26px,3vw,36px)" }}>
-              Cuatro cosas que hoy no tenés escritas en ningún lado
+          {/* Cota de alcance: reemplaza al ticker. El 68 % del tráfico no es de Argentina. */}
+          <div className="banda">
+            <div className="banda-in">
+              <span><b>100 % remoto</b> · PyMEs de Argentina, Bolivia, Honduras y el resto de Latinoamérica</span>
             </div>
-          </div>
-          <div className="stats-grid">
-            {ENTREGABLES.map((e, i) => (
-              <div key={e.n} className={`stat-item reveal d${i + 1}`}>
-                <div className="stat-num">{e.n}</div>
-                <div className="stat-label">{e.title}</div>
-                <div className="stat-desc">{e.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CALCULADORA */}
-        <CostCalculator calUrl={calUrl} />
-
-        {/* DOLOR */}
-        <section className="sec" id="dolor">
-          <div className="reveal">
-            <div className="sec-label">Lo que aparece siempre</div>
-            <div className="sec-title">
-              Cuatro agujeros que se repiten en <span className="accent">casi todos los negocios</span>
-            </div>
-            <div className="sec-sub">
-              Esto no sale de un estudio. Sale de hablar con más de cincuenta dueños de negocio este
-              año — ferreterías, e-commerce, academias, distribuidoras, prestadores de servicio.
-            </div>
-          </div>
-
-          <div className="pain-grid">
-            {DOLORES.map((d, i) => (
-              <div key={d.n} className={`pain-card reveal d${(i % 2) + 1}`}>
-                <div className="pain-head">
-                  <span className="pieza">{d.n}</span>
-                  <span className="pain-title">{d.title}</span>
-                </div>
-                <p className="pain-body">{d.body}</p>
-                <blockquote className="pain-quote">
-                  “{d.quote}”
-                  <cite>{d.cite}</cite>
-                </blockquote>
-              </div>
-            ))}
           </div>
         </section>
 
-        {/* TRANSFORMACIÓN */}
-        <section className="transform-section sec">
+        {/* QUIÉN TE ATIENDE */}
+        <Quien />
+
+        {/* ENTREGABLES — las cuatro páginas del informe */}
+        <section className="stats-section" aria-label="Qué te llevás">
           <div className="reveal">
-            <div className="sec-label">La diferencia</div>
-            <div className="sec-title">
-              De trabajar en el negocio a que el negocio{" "}
-              <span className="accent">trabaje solo</span>
-            </div>
-          </div>
-
-          <div className="compare-grid">
-            <div className="compare-col reveal d1">
-              <div className="compare-head" style={{ color: "var(--color-alert)" }}>
-                <span>✕</span> Cómo funciona hoy
-              </div>
-              {[
-                "Cada proceso depende de que alguien se acuerde de hacerlo",
-                "Nadie sabe cuánto cuesta realmente atender un pedido",
-                "Para crecer hay que contratar, con todo lo que eso implica",
-                "Los clientes que no compraron quedan en un chat, sin volver",
-                "Cuando falta la persona que sabe, se frena todo",
-              ].map((t) => (
-                <div className="compare-item" key={t}>
-                  <span className="ci-mark ci-x">✕</span>
-                  <span>{t}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="compare-col after reveal d2">
-              <div className="compare-head accent">
-                <span>✓</span> Cómo queda
-              </div>
-              {[
-                "Cada proceso corre solo, con reglas escritas y auditables",
-                "Sabés qué te cuesta cada operación y cuánto deja",
-                "El volumen sube sin que suba la nómina",
-                "Al que no compró se lo retoma sin que nadie lo recuerde",
-                "El conocimiento queda en el sistema, no en una persona",
-              ].map((t) => (
-                <div className="compare-item" key={t}>
-                  <span className="ci-mark ci-ok">✓</span>
-                  <span>{t}</span>
+            <SecHead
+              hoja="03"
+              label="Qué te llevás"
+              title="Cuatro cosas que hoy no tenés escritas en ningún lado"
+              nota="Cuatro entregables. Ninguno es una presentación."
+            />
+            <div className="stats-grid">
+              {ENTREGABLES.map((e) => (
+                <div key={e.n} className="stat-item">
+                  <PaginaInforme id={e.pagina} n={e.n} />
+                  <div className="stat-num">{e.n}</div>
+                  <h3 className="stat-label">{e.title}</h3>
+                  <p className="stat-desc">{e.desc}</p>
                 </div>
               ))}
             </div>
           </div>
-
-          <div className="honesty framed reveal d3">
-            <div className="tech" style={{ marginBottom: 14 }}>Lo que no vas a escuchar en otro lado</div>
-            <p className="honesty-text">
-              No te voy a decir que la inteligencia artificial resuelve todo. En la auditoría vas a
-              ver que hay procesos donde <strong>no conviene implementarla</strong> — porque el volumen no
-              da, porque las reglas cambian todo el tiempo, o porque simplemente sale más caro que
-              hacerlo a mano. Eso también te lo digo, y por escrito. Es la parte que nadie menciona
-              cuando lo único que tiene para venderte es un bot.
-            </p>
-          </div>
         </section>
 
-        {/* CÓMO */}
-        <div className="how-section" id="como">
-          <div className="how-inner">
-            <div className="reveal">
-              <div className="sec-label">El proceso</div>
-              <div className="sec-title">Tres etapas, y en cada una sabés a qué atenerte</div>
-              <div className="sec-sub">
-                Nada de propuestas de veinte páginas ni de proyectos abiertos. Cada etapa tiene
-                precio, plazo y entregable definido antes de arrancar.
-              </div>
+        {/* CÓMO — sube acá: es la sección que más convierte y la veía menos de la mitad */}
+        <section className="how-section" id="como" aria-label="Cómo funciona">
+          <div className="how-inner reveal">
+            <SecHead
+              hoja="04"
+              label="El proceso"
+              title="Tres etapas, y en cada una sabés a qué atenerte"
+              sub="Nada de propuestas de veinte páginas ni de proyectos abiertos. Cada etapa tiene precio, plazo y entregable definido antes de arrancar."
+              nota="Cada etapa cierra sola. Ninguna te obliga a la siguiente."
+            />
+
+            {/* Cotas: la línea de tiempo del proceso, medida como en un plano */}
+            <div className="steps-cotas" aria-hidden="true">
+              {ETAPAS.map((s) => (
+                <div key={s.n} className="cota">
+                  <span className="cota-val">{s.cota}</span>
+                </div>
+              ))}
             </div>
 
             <div className="steps-grid">
-              {ETAPAS.map((s, i) => (
-                <div key={s.n} className={`step-card framed reveal d${i + 1}`}>
+              {ETAPAS.map((s) => (
+                <div key={s.n} className={`step-card framed${s.hi ? " hi" : ""}`}>
                   <div className="step-num">ETAPA {s.n}</div>
-                  <div className="step-title">{s.title}</div>
-                  <div className="step-desc">{s.desc}</div>
+                  <h3 className="step-title">{s.title}</h3>
+                  <p className="step-desc">
+                    {s.desc}
+                    {s.extra && <> <strong>{s.extra}</strong></>}
+                  </p>
+                  {s.garantia && (
+                    <p className="step-garantia">
+                      <b>Con garantía.</b> {s.garantia}
+                    </p>
+                  )}
                   <div className="step-meta">
                     {s.chips.map((c) => (
                       <span key={c} className={`step-chip${s.hi ? " hi" : ""}`}>{c}</span>
@@ -358,86 +312,165 @@ export default function Home() {
               ))}
             </div>
 
-            <div style={{ marginTop: 52 }} className="reveal d3">
-              <div className="cota" style={{ maxWidth: 520, margin: "0 auto 26px" }}>
+            <div className="how-cta">
+              <div className="cota">
                 <span className="cota-val">Empieza acá</span>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 13 }}>
-                <a
-                  href={calUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary"
-                  data-cta="como"
-                >
-                  Agendar la llamada
-                  <span>→</span>
-                </a>
-                <div className="cta-note">
-                  Sin costo · Sin compromiso · Si no aplica para vos, te lo digo en la llamada
-                </div>
+              <a
+                href={calUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary"
+                data-cta="como"
+              >
+                Agendar la llamada
+                <span aria-hidden="true">→</span>
+              </a>
+              <div className="cta-note">
+                Sin costo · Sin compromiso · Si no aplica para vos, te lo digo en la llamada
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* FAQ */}
-        <section className="faq-section" id="faq">
-          <div className="reveal">
-            <div className="sec-label">Preguntas</div>
-            <div className="sec-title" style={{ fontSize: "clamp(26px,3vw,38px)" }}>
-              Lo que todos preguntan antes de arrancar
-            </div>
-          </div>
-          <div className="faq-list reveal d1">
-            {FAQS.map((f, i) => (
-              <div key={f.q} className="faq-item">
-                <button
-                  className="faq-btn"
-                  onClick={(e) => {
-                    const item = (e.currentTarget as HTMLButtonElement).closest(".faq-item");
-                    if (!item) return;
-                    const wasOpen = item.classList.contains("open");
-                    document.querySelectorAll(".faq-item").forEach((el) => el.classList.remove("open"));
-                    if (!wasOpen) item.classList.add("open");
-                  }}
-                  type="button"
-                  aria-expanded="false"
-                  aria-controls={`faq-body-${i}`}
-                >
-                  {f.q}
-                  <span className="faq-icon">+</span>
-                </button>
-                <div className="faq-body" id={`faq-body-${i}`}>{f.a}</div>
-              </div>
-            ))}
           </div>
         </section>
 
-        {/* QUIZ (cierre) */}
-        <DiagnosticQuiz calUrl={calUrl} />
+        {/* CALCULADORA */}
+        <CostCalculator calUrl={calUrl} />
+
+        {/* DOLOR */}
+        <section className="sec" id="dolor" aria-label="El problema">
+          <div className="reveal">
+            <SecHead
+              hoja="06"
+              label="Lo que aparece siempre"
+              title={<>Cuatro agujeros que se repiten en <span className="accent">casi todos los negocios</span></>}
+              sub="Esto no sale de un estudio. Sale de hablar con más de cincuenta dueños de negocio este año — ferreterías, e-commerce, academias, distribuidoras, prestadores de servicio."
+              nota="Citas textuales de llamadas de este año."
+            />
+
+            <div className="pain-grid">
+              {DOLORES.map((d) => (
+                <div key={d.n} className="pain-card">
+                  <div className="pain-head">
+                    <Pictograma id={d.icono} />
+                    <h3 className="pain-title">{d.title}</h3>
+                  </div>
+                  <p className="pain-body">{d.body}</p>
+                  <blockquote className="pain-quote">
+                    “{d.quote}”
+                    <cite>{d.cite}</cite>
+                  </blockquote>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* TRANSFORMACIÓN */}
+        <section className="transform-section sec" aria-label="La diferencia">
+          <div className="reveal">
+            <SecHead
+              hoja="07"
+              label="La diferencia"
+              title={<>De trabajar en el negocio a que el negocio <span className="accent">trabaje solo</span></>}
+              nota="Lo que cambia no es la herramienta: es quién sostiene el proceso."
+            />
+
+            <div className="compare-table">
+              <div className="cmp-head x"><span aria-hidden="true">✕</span> Cómo funciona hoy</div>
+              <div className="cmp-head ok"><span aria-hidden="true">✓</span> Cómo queda</div>
+              {COMPARACION.map(([hoy, despues]) => (
+                <Fragment key={hoy}>
+                  <div className="cmp-cell">
+                    <span className="ci-mark ci-x" aria-hidden="true">✕</span>
+                    <span>{hoy}</span>
+                  </div>
+                  <div className="cmp-cell after">
+                    <span className="ci-mark ci-ok" aria-hidden="true">✓</span>
+                    <span>{despues}</span>
+                  </div>
+                </Fragment>
+              ))}
+            </div>
+
+            <div className="honesty framed">
+              <div className="tech" style={{ marginBottom: 14 }}>Lo que no vas a escuchar en otro lado</div>
+              <p className="honesty-text">
+                No te voy a decir que la inteligencia artificial resuelve todo. En la auditoría vas a
+                ver que hay procesos donde <strong>no conviene implementarla</strong> — porque el volumen no
+                da, porque las reglas cambian todo el tiempo, o porque simplemente sale más caro que
+                hacerlo a mano. Eso también te lo digo, y por escrito. Es la parte que nadie menciona
+                cuando lo único que tiene para venderte es un bot.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ¿ES PARA VOS? — reemplaza al quiz */}
+        <ParaQuien calUrl={calUrl} />
+
+        {/* FAQ */}
+        <section className="faq-section" id="faq" aria-label="Preguntas frecuentes">
+          <div className="reveal">
+            <SecHead
+              hoja="09"
+              label="Preguntas"
+              title="Lo que todos preguntan antes de arrancar"
+              nota="Lo que se pregunta antes de agendar."
+            />
+            <div className="faq-list">
+              {FAQS.map((f, i) => {
+                const abierta = faqAbierta === i;
+                return (
+                  <div key={f.id} className={`faq-item${abierta ? " open" : ""}`}>
+                    <h3 className="faq-q">
+                      <button
+                        type="button"
+                        className="faq-btn"
+                        aria-expanded={abierta}
+                        aria-controls={`faq-body-${i}`}
+                        data-faq-id={f.id}
+                        onClick={() => setFaqAbierta(abierta ? null : i)}
+                      >
+                        {f.q}
+                        <span className="faq-icon" aria-hidden="true">+</span>
+                      </button>
+                    </h3>
+                    <div className="faq-body" id={`faq-body-${i}`} role="region" aria-hidden={!abierta}>
+                      <div>{f.a}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
       </main>
 
-      {/* FOOTER */}
-      <footer>
+      {/* FOOTER — el cartucho del plano */}
+      <footer aria-label="Pie de página">
+        <div className="cartucho">
+          <div className="cart-cell"><span className="cart-k">Proyecto</span><span className="cart-v">Auditoría de operaciones con IA</span></div>
+          <div className="cart-cell"><span className="cart-k">Revisión</span><span className="cart-v">v3 · 09/2026</span></div>
+          <div className="cart-cell"><span className="cart-k">Hojas</span><span className="cart-v">{HOJAS}</span></div>
+          <div className="cart-cell"><span className="cart-k">Dibujó</span><span className="cart-v">Ignacio Arruvito</span></div>
+          <div className="cart-cell"><span className="cart-k">Escala</span><span className="cart-v">100 % remoto</span></div>
+          <div className="cart-cell">
+            <span className="cart-k">Contacto</span>
+            <span className="cart-v"><a href="mailto:iabyia.business@gmail.com">iabyia.business@gmail.com</a></span>
+          </div>
+        </div>
         <div className="footer-bottom">
-          <a href="#" className="wordmark" style={{ fontSize: 16 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/assets/logo-icon-transparent.png"
-              alt="IAbyIA"
-              width={22}
-              height={22}
-              className="wm-icon"
-              style={{ width: 22, height: 22 }}
-            />
-            <span>IAbyIA</span>
+          <a href="/" className="wordmark" style={{ fontSize: 16 }}>
+            <Wordmark size={22} />
           </a>
-          <nav className="footer-links">
-            <a href="/privacidad.html" className="footer-link">Privacidad</a>
-            <a href="/terminos.html" className="footer-link">Términos</a>
+          <nav className="footer-links" aria-label="Legales y redes">
+            <a href="/privacidad" className="footer-link">Privacidad</a>
+            <a href="/terminos" className="footer-link">Términos</a>
+            {REDES.map((r) => (
+              <a key={r.n} href={r.u} target="_blank" rel="noopener noreferrer" className="footer-link">{r.n}</a>
+            ))}
           </nav>
-          <p className="footer-copy">© 2026 · Buenos Aires, Argentina</p>
+          <p className="footer-copy">© 2026 IAbyIA · Buenos Aires, Argentina</p>
         </div>
       </footer>
     </>
