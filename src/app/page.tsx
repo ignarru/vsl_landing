@@ -195,7 +195,8 @@ export default function Home() {
         </section>
 
         {/* PRUEBA, arriba: la mitad de la gente no llega a la mitad de la página.
-            ⏳ [VERIFICAR] los números del caso los tiene que pasar Ignacio. */}
+            Sin números de antes/después (04/11): el "antes" nunca se midió y no se inventa. Si algún
+            día se mide un caso, va acá. */}
         <section className="seccion transform-section">
           <div className="contenedor caso-grid">
             <div>
@@ -216,10 +217,6 @@ export default function Home() {
                 Le entran entre 70 y 80 WhatsApps por día. Desde octubre, el agente responde las consultas,
                 cotiza con el stock del sistema y le pasa a una persona lo que necesita criterio.
               </blockquote>
-              <div className="caso-numeros">
-                <div><span>Antes</span><strong className="verificar">[VERIFICAR: tiempo de respuesta]</strong></div>
-                <div><span>Ahora</span><strong className="verificar">[VERIFICAR: tiempo de respuesta]</strong></div>
-              </div>
             </figure>
           </div>
         </section>
