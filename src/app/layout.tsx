@@ -1,31 +1,31 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { DM_Sans, Space_Grotesk } from "next/font/google";
 import Script from "next/script";
 import Tracker from "@/components/tracker";
 import { CTA_BOOT } from "@/lib/cta-boot";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+/* v4 (nov 2026): estética oscura y simple. Fuentes self-hosted por next/font: sin la hoja de
+   Google Fonts bloqueando el render (en v2 el LCP en celular era de 6,3 s). */
+const titulos = Space_Grotesk({ variable: "--font-titulos", subsets: ["latin"], weight: ["500", "700"], display: "swap" });
+const cuerpo = DM_Sans({ variable: "--font-cuerpo", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "IAbyIA — Auditoría de operaciones con IA",
+  title: "IAbyIA — IA para vender más en tu negocio online",
   description:
-    "Te hago el mapa de cómo funciona tu negocio por dentro, cuánto te cuesta cada proceso en horas y en plata, y qué conviene automatizar primero. Después lo implemento. Para PyMEs de 5 a 50 personas.",
+    "Vendé más con la misma pauta y el mismo equipo. Metemos IA en tu marketing, tus ventas y tu operación, empezando por donde más plata perdés.",
   keywords: [
-    "auditoría de procesos",
-    "automatización de procesos con IA",
-    "operaciones con inteligencia artificial",
-    "IA para PyMEs",
-    "automatizar tareas repetitivas",
+    "consultoría de IA",
+    "IA para e-commerce",
+    "automatización con IA",
+    "agentes de IA para ventas",
+    "IA para negocios online",
     "IAbyIA",
   ],
   openGraph: {
-    title: "IAbyIA — Auditoría de operaciones con IA",
+    title: "IAbyIA — IA para vender más en tu negocio online",
     description:
-      "El problema no es que no le contestes. Es todo lo que pasa después. Te muestro dónde tu negocio pierde plata y horas, y cuánto vale cada agujero.",
+      "Vendé más con la misma pauta y el mismo equipo. Metemos IA en tu marketing, tus ventas y tu operación.",
     type: "website",
     locale: "es_AR",
   },
@@ -46,24 +46,13 @@ export default function RootLayout({
             hidrate React. El HTML estático los sirve pelados y un clic temprano perdía la
             atribución Y el puente con /landing. Ver lib/cta-boot.ts. */}
         <script dangerouslySetInnerHTML={{ __html: CTA_BOOT }} />
-        {/* Archivo (display condensada, eje de ancho) + Martian Mono (rotulación técnica).
-            Las dos son variables: el CSS ajusta el ancho con font-variation-settings. */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Martian+Mono:wdth,wght@75..112.5,300..700&display=swap"
-          rel="stylesheet"
-        />
-        {/* Google Analytics 4 */}
+        {/* Google Analytics 4 — lazyOnload: en v2 se llevaba ~0,5 s del hilo principal en celular
+            antes de que la página fuera usable. El tracking propio (Tracker) no depende de GA. */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-H2DYQH0VWY"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -72,7 +61,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${geistSans.variable} antialiased`}>
+      <body className={`${titulos.variable} ${cuerpo.variable} antialiased`}>
         {children}
         {/* Tracking propio → dashboard.iabyia.com.ar. Es el único que puede unir una visita con
             la reunión y la venta que generó; GA4 (arriba) queda para el tráfico general. */}

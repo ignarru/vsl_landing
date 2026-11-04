@@ -1,445 +1,382 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AuditReport from "@/components/audit-report";
-import CostCalculator from "@/components/cost-calculator";
-import DiagnosticQuiz from "@/components/diagnostic-quiz";
-import MorphingText from "@/components/morphing-text";
-import ScrollEffects from "@/components/scroll-effects";
+import CalculadoraVentas from "@/components/calculadora-ventas";
 import { CAL_BASE, buildCalUrl } from "@/lib/cal-link";
 import { getSid } from "@/lib/track";
 
-const TICKER_ITEMS = [
-  "Presupuestos",
-  "Seguimiento de clientes",
-  "Facturación",
-  "Coordinación de entregas",
-  "Cobranzas",
-  "Carga de pedidos",
-  "Turnos y agenda",
-  "Control de stock",
-  "Reportes",
-  "Recompra",
-  "Altas de productos",
-  "Atención de consultas",
-];
+/* ═══ LANDING v4 — oferta integral (nov 2026) ════════════════════════════════════════════
+   Oferta: obsidian/01 - Negocio/Oferta integral — IA en marketing, ventas y operación (2026-11).md
+   Investigación: obsidian/08 - Conocimiento/Landings — qué retiene y convierte (investigación nov 2026).md
 
-const ENTREGABLES = [
-  {
-    n: "01",
-    title: "El mapa de tus procesos",
-    desc: "Cómo se hace hoy cada cosa, quién la hace y cuánto tarda. Escrito, no de memoria.",
-  },
-  {
-    n: "02",
-    title: "Cuánto te cuesta cada uno",
-    desc: "En horas y en plata al año, calculado con tus números reales. No con promedios del sector.",
-  },
-  {
-    n: "03",
-    title: "Dónde entra la IA",
-    desc: "Y dónde no conviene implementarla, que es igual de importante y nadie te lo dice.",
-  },
-  {
-    n: "04",
-    title: "El plan, ordenado por retorno",
-    desc: "Qué hacer primero, qué después, y cuánto sale cada cosa. Para que decidas con números.",
-  },
-];
+   Tracking (NO romper): las secciones conservan los selectores que mide lib/track.ts y los
+   botones usan solo los data-cta que acepta el dashboard (nav, hero, calculadora, como, quiz).
+     .hero → hero · #dolor → dolor · .stats-section → las 3 áreas · #calculadora
+     #como → el método · .transform-section → lo que ya funciona · #diagnostico → para quién
+     #faq → preguntas · footer
+   Sin animaciones de entrada: en v2 la del hero demoraba 5,4 s el contenido principal en celu. */
 
 const DOLORES = [
   {
-    n: "01",
-    title: "Al que no compró, nadie lo vuelve a llamar",
-    body: "Entran consultas todos los días. Un porcentaje compra en el momento. El resto queda en un chat y no lo retoma nadie, porque no hay proceso: depende de que alguien se acuerde.",
-    quote: "Ella una vez que no le responde, no le vuelve a hacer seguimiento. Esa es una realidad. Lo deja morir.",
-    cite: "Academia con 4 sedes · Bolivia",
+    cita: "La cuestión no es meter más plata en publicidad, porque ya lo hicimos. No damos abasto.",
+    quien: "E-commerce · Uruguay",
   },
   {
-    n: "02",
-    title: "Coordinar a mano frena el crecimiento",
-    body: "Agendar, rutear, confirmar, avisar. Cuando el volumen sube, el que coordina se convierte en el cuello de botella — y ahí se frena la venta, no la producción.",
-    quote: "La cuestión no es meter más plata en publicidad, porque ya lo hicimos. No damos abasto.",
-    cite: "E-commerce · Uruguay",
+    cita: "Por más que le ponga más plata a Meta, del otro lado no puede llevar a cabo.",
+    quien: "E-commerce · Argentina",
   },
   {
-    n: "03",
-    title: "La plata que entra se controla a ojo",
-    body: "Transferencias que se revisan una por una, pagos que se cruzan en una planilla, clientes que quedan debiendo sin que nadie lo note hasta fin de mes.",
-    quote: "Una transferencia puede ser clonada, y ahora estamos revisando transferencia por transferencia. Es un tema lento.",
-    cite: "Proveedor de internet · Chile",
-  },
-  {
-    n: "04",
-    title: "Los datos desordenados frenan todo lo demás",
-    body: "Catálogos con productos que ya no existen, precios en tres lugares distintos, stock que no coincide entre canales. Nada se puede automatizar arriba de eso.",
-    quote: "De esos 14.000, uso 5.000. Es un laburo ponerme a eliminarlos uno por uno, entonces lo dejo.",
-    cite: "Ferretería, 2 sucursales · Argentina",
+    cita: "Le hablan a las nueve y le contestan a las tres.",
+    quien: "Mayorista con venta online · Buenos Aires",
   },
 ];
 
-const ETAPAS = [
+const AREAS = [
   {
-    n: "01",
-    title: "La llamada",
-    desc: "Miramos tu operación por arriba y vemos si tiene sentido avanzar. Si no lo tiene, te lo digo ahí mismo y no perdemos más tiempo ninguno de los dos.",
-    chips: ["Sin costo", "Sin compromiso"],
+    nombre: "Marketing",
+    para: "Atraer",
+    items: [
+      "Creatividades y fotos de producto con IA",
+      "Guiones para anuncios y reels",
+      "Publicación automática",
+      "Saber qué anuncio trae ventas",
+    ],
   },
   {
-    n: "02",
-    title: "La auditoría",
-    desc: "Dos sesiones: con vos y con quien maneja el día a día. Salís con el mapa completo, el costo real de cada proceso y el presupuesto de cada solución. Si después avanzamos, lo que pagaste acá se descuenta.",
-    chips: ["2 semanas", "Se descuenta"],
-    hi: true,
+    nombre: "Ventas",
+    para: "Convertir",
+    items: [
+      "Respuesta en ~1 minuto en WhatsApp, Instagram y la web",
+      "Seguimiento de consultas y carritos sin cerrar",
+      "Reparto de leads entre vendedores",
+      "Recompra y reactivación de clientes",
+    ],
   },
   {
-    n: "03",
-    title: "La implementación",
-    desc: "Con el plan en la mano elegís: lo implemento yo, o le enseño a alguien de tu equipo a hacerlo. Según lo que te convenga y qué tan adentro querés la capacidad.",
-    chips: ["Lo hago yo", "o te enseño"],
+    nombre: "Operación",
+    para: "Entregar y cobrar",
+    items: [
+      "Estado de pedidos y envíos",
+      "Stock en un solo lugar",
+      "Pagos conciliados solos",
+      "Un reporte diario de ventas y pauta",
+    ],
   },
+];
+
+const PASOS = [
+  {
+    n: "1",
+    titulo: "Llamada",
+    texto: "Me contás cómo vende tu negocio hoy y vemos si tiene sentido trabajar juntos. Si no lo tiene, te lo digo ahí.",
+    nota: "Gratis",
+  },
+  {
+    n: "2",
+    titulo: "Diagnóstico",
+    texto: "Te muestro el mapa de tu marketing, tus ventas y tu operación: dónde se pierde plata en cada una y por cuál conviene empezar.",
+    nota: "Gratis",
+  },
+  {
+    n: "3",
+    titulo: "Un área por vez",
+    texto: "Arrancamos por la que más pierde, con un objetivo medible por mes. Primero lo hago yo, después lo hacemos juntos y al final lo hace tu equipo.",
+    nota: "Encuentros fijos por semana",
+  },
+  {
+    n: "4",
+    titulo: "Medición",
+    texto: "Cada mes, un informe con tus números contra cómo estaban al empezar. Lo construido queda a tu nombre: tus cuentas, tus datos.",
+    nota: "Todos los meses",
+  },
+];
+
+const FUNCIONA = [
+  { dato: "24/7", texto: "agentes de IA atendiendo a los clientes de mis clientes, también de noche y los fines de semana" },
+  { dato: "~1 min", texto: "lo que tarda un agente en responderle a un cliente, a cualquier hora" },
+  { dato: "3 áreas", texto: "donde ya lo aplico en IAbyIA: el contenido, la atención y la operación" },
+];
+
+const SI = [
+  "Tenés un negocio online que factura más de USD 30.000 por mes",
+  "Ponés plata en pauta y entran más consultas de las que tu equipo contesta",
+  "Decidís vos, o tus socios están en la llamada",
+  "Querés que tu equipo aprenda a usarlo, no depender de alguien para siempre",
+];
+
+const NO = [
+  "Sos una agencia o un desarrollador buscando cómo hacerlo",
+  "Recién empezás y todavía no hay ventas que recuperar",
+  "Buscás un bot de respuestas automáticas para salir del paso",
+  "Tu rubro es apuestas, préstamos o cobranza (WhatsApp no los permite)",
 ];
 
 const FAQS = [
   {
-    q: "¿Cómo se cotiza el trabajo?",
-    a: "Por etapas, y cada una con precio cerrado antes de arrancar. La auditoría tiene un valor fijo, porque el alcance es siempre el mismo. La implementación se cotiza recién cuando terminamos de revisar cómo trabajás: antes de ver tu negocio por dentro, cualquier número que te dé sería inventado. Los valores concretos los vemos en la llamada, sin vueltas.",
+    q: "¿Cuánto cuesta?",
+    a: "Depende de cuántas áreas trabajemos y con qué ritmo. Lo vemos en la llamada con tus números, y el diagnóstico es gratis: sabés qué conviene hacer antes de pagar nada.",
   },
   {
-    q: "¿Y si en mi negocio no hay nada para automatizar?",
-    a: "Puede pasar, y si es así te lo digo. Por eso la auditoría tiene devolución total: si al terminarla considerás que no te sirvió, te devuelvo lo que pagaste, sin preguntas. Lo que sí te puedo asegurar es que vas a salir sabiendo cuánto te cuesta cada proceso, que es información que hoy casi ninguna PyME tiene.",
+    q: "¿Cuánto tiempo me lleva a mí?",
+    a: "Un encuentro fijo por semana (o dos, si querés ir más rápido) y alguien de tu equipo que le dedique unas horas. El trabajo pesado lo hago yo, sobre todo al principio.",
   },
   {
-    q: "¿Tengo que cambiar los sistemas que ya uso?",
-    a: "No. El trabajo se hace arriba de lo que ya tenés: WhatsApp, tu sistema de gestión, tu e-commerce, planillas, lo que sea. Cambiar todo de golpe es la forma más cara y más lenta de hacer esto.",
+    q: "Ya lo intentamos solos y no funcionó.",
+    a: "Es lo más común. Casi siempre falla por empezar por la herramienta y no por el problema. Acá primero se mide dónde se pierde la plata y recién después se construye, un área por vez.",
   },
   {
-    q: "¿Mi equipo tiene que saber de tecnología?",
-    a: "No. Si elegís que lo implemente yo, queda funcionando y tu equipo solo usa el resultado. Si elegís aprender a hacerlo adentro, se lo enseño a la persona que vos elijas, sobre tus propios procesos y no en abstracto.",
+    q: "¿Y si la IA le responde mal a un cliente?",
+    a: "Se prueba con consultas reales antes de salir, responde solo con la información de tu negocio y pasa la conversación a una persona cuando no sabe o cuando el cliente lo pide.",
   },
   {
-    q: "¿Esto es un bot de WhatsApp?",
-    a: "No. Un bot sigue un guion fijo y se rompe apenas alguien pregunta algo que no estaba previsto — por eso dan la sensación de estar hablando con una pared. Lo que se implementa es un agente de IA entrenado con la información real de tu negocio: entiende lo que le preguntan, responde con criterio, consulta tu stock o tus precios si hace falta, y deriva a una persona cuando el caso lo amerita. Dicho eso, la atención al cliente es solo uno de los procesos que puede salir de la auditoría. Si resulta que ahí está tu cuello de botella, lo implementamos; si está en la coordinación, en la cobranza o en el seguimiento, atacamos eso primero. Primero se mide, después se decide qué construir.",
+    q: "¿Voy a depender de vos para siempre?",
+    a: "No. Todo queda a tu nombre: tus cuentas, tus datos, tus sistemas. Y el programa termina con tu equipo manejándolo solo. Esa es la idea.",
   },
   {
-    q: "¿Cuánto tardo en ver resultados?",
-    a: "La auditoría son dos semanas y ahí ya tenés los números sobre la mesa. La implementación depende del alcance, pero se arma por etapas: la primera siempre es la de mayor retorno y menor complejidad, para que el sistema empiece a devolver antes de estar terminado.",
+    q: "¿Y si no funciona?",
+    a: "Si al final del primer mes el objetivo que acordamos no está funcionando, te podés ir y te devuelvo lo que no usaste. La única condición es que hayamos hecho los encuentros.",
+  },
+  {
+    q: "¿Me pueden bloquear el WhatsApp?",
+    a: "Se trabaja con la API oficial de WhatsApp y respetando sus reglas, que es lo que evita los bloqueos. Si ya te pasó, lo vemos en la llamada.",
+  },
+  {
+    q: "¿Tengo que cambiar los sistemas que uso?",
+    a: "No. Se trabaja arriba de lo que ya tenés: tu tienda, tu WhatsApp, tus planillas, tu sistema de gestión.",
   },
 ];
 
 export default function Home() {
-  // Link a cal.com con la atribución del visitante (utm + lp_sid).
-  // El script inline del <head> (lib/cta-boot.ts) ya resolvió esta misma URL antes de que
-  // hidratáramos y con ella pintó los href. Reusarla —en vez de recalcularla— garantiza que
-  // el link no cambie entre antes y después de la hidratación: una sola verdad, un solo sid.
+  // Link a cal.com con la atribución del visitante (utm + lp_sid). El script inline del <head>
+  // (lib/cta-boot.ts) ya resolvió esta URL antes de hidratar: se reusa para no cambiar el link.
   const [calUrl, setCalUrl] = useState(CAL_BASE);
   useEffect(() => {
     const w = window as unknown as { __lpCalUrl?: string };
     setCalUrl(w.__lpCalUrl || buildCalUrl({ sid: getSid() }));
   }, []);
 
+  const [abierta, setAbierta] = useState<number | null>(null);
+
   return (
     <>
-      <ScrollEffects />
-      <div className="scroll-bar" id="scrollBar" />
-
-      {/* NAV */}
-      <nav className="nav-bar">
-        <a href="#" className="wordmark">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/logo-icon-transparent.png" alt="IAbyIA" width={26} height={26} className="wm-icon" />
-          <span>IAbyIA</span>
-        </a>
-        <div className="nav-links">
-          <a href="#dolor" className="nav-link">El problema</a>
-          <a href="#como" className="nav-link">Cómo funciona</a>
-          <a href="#faq" className="nav-link">FAQ</a>
+      <nav className="nav">
+        <div className="contenedor nav-in">
+          <a href="#" className="marca">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/logo-icon-transparent.png" alt="" width={24} height={24} />
+            <span>IAbyIA</span>
+          </a>
+          <div className="nav-links">
+            <a href="#como">Cómo trabajamos</a>
+            <a href="#faq">Preguntas</a>
+          </div>
+          <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton boton-chico" data-cta="nav">
+            Agendar llamada
+          </a>
         </div>
-        {/* data-cta: lo lee el listener delegado de lib/track.ts para saber QUÉ botón convence. */}
-        <a href={calUrl} target="_blank" rel="noopener noreferrer" className="nav-cta" data-cta="nav">
-          <span className="live-dot" />
-          Agendar llamada
-          <span className="nav-cta-arrow">→</span>
-        </a>
       </nav>
 
       <main>
         {/* HERO */}
-        <section>
-          <div className="hero">
-            <div className="hero-left">
-              <div className="hero-tag reveal">
-                <span className="live-dot" />
-                Auditoría de operaciones con IA
-              </div>
-
-              <h1 className="h1 reveal d1">
-                Tu negocio pierde plata en
-                <MorphingText />
-                <span className="h1-remate">Y todavía no sabés cuánta.</span>
-              </h1>
-
-              <p className="hero-sub reveal d2">
-                No son solo horas: es plata que se va todos los meses. Te hago el mapa de cómo
-                funciona tu negocio por dentro, <strong>le pongo número a cada proceso</strong> y
-                te digo qué conviene automatizar primero. Después lo implemento.
+        <section className="hero">
+          <div className="contenedor hero-grid">
+            <div>
+              <p className="etiqueta">Consultoría de IA para negocios online</p>
+              <h1>Vendé más con la misma pauta y el mismo equipo.</h1>
+              <p className="hero-sub">
+                Metemos IA en tu marketing, tus ventas y tu operación. Empezamos por donde más plata
+                perdés hoy, y sumamos un área por vez.
               </p>
-
-              <div className="hero-ctas reveal d3">
-                <a
-                  href={calUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary"
-                  data-cta="hero"
-                >
-                  Ver cuánto estoy perdiendo
-                  <span>→</span>
+              <div className="hero-acciones">
+                <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton" data-cta="hero">
+                  Agendar una llamada
                 </a>
-                <div className="cta-note">
-                  <span className="live-dot" />
-                  Llamada sin costo · Sin compromiso
-                </div>
+                <span className="hero-nota">Llamada y diagnóstico gratis</span>
               </div>
+              <p className="hero-filtro">Para negocios online que facturan más de USD 30.000 por mes.</p>
             </div>
 
-            {/* El informe se ejecuta solo — ver components/audit-report.tsx */}
-            <div className="reveal d2">
-              <AuditReport />
+            <div className="hero-panel" aria-label="Dónde se pierde la plata en un negocio online">
+              <p className="panel-titulo">Dónde se pierde la plata</p>
+              {[
+                ["Marketing", "El contenido sale cuando alguien tiene tiempo"],
+                ["Ventas", "Las consultas esperan horas y no se retoman"],
+                ["Operación", "Pedidos, stock y pagos cruzados a mano"],
+              ].map(([area, texto]) => (
+                <div key={area} className="panel-fila">
+                  <span className="panel-area">{area}</span>
+                  <span>{texto}</span>
+                </div>
+              ))}
+              <p className="panel-pie">Empezamos por la que más pierde.</p>
             </div>
           </div>
         </section>
 
-        {/* TICKER — procesos, no tecnologías */}
-        <div className="ticker-wrap">
-          <div className="ticker-track">
-            {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
-              <span key={`${item}-${i}`} className="ticker-item">{item}</span>
-            ))}
-          </div>
-        </div>
-
-        {/* ENTREGABLES */}
-        <div className="stats-section">
-          <div className="reveal" style={{ marginBottom: 34 }}>
-            <div className="sec-label">Qué te llevás</div>
-            <div className="sec-title" style={{ fontSize: "clamp(26px,3vw,36px)" }}>
-              Cuatro cosas que hoy no tenés escritas en ningún lado
-            </div>
-          </div>
-          <div className="stats-grid">
-            {ENTREGABLES.map((e, i) => (
-              <div key={e.n} className={`stat-item reveal d${i + 1}`}>
-                <div className="stat-num">{e.n}</div>
-                <div className="stat-label">{e.title}</div>
-                <div className="stat-desc">{e.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CALCULADORA */}
-        <CostCalculator calUrl={calUrl} />
-
-        {/* DOLOR */}
-        <section className="sec" id="dolor">
-          <div className="reveal">
-            <div className="sec-label">Lo que aparece siempre</div>
-            <div className="sec-title">
-              Cuatro agujeros que se repiten en <span className="accent">casi todos los negocios</span>
-            </div>
-            <div className="sec-sub">
-              Esto no sale de un estudio. Sale de hablar con más de cincuenta dueños de negocio este
-              año — ferreterías, e-commerce, academias, distribuidoras, prestadores de servicio.
-            </div>
-          </div>
-
-          <div className="pain-grid">
-            {DOLORES.map((d, i) => (
-              <div key={d.n} className={`pain-card reveal d${(i % 2) + 1}`}>
-                <div className="pain-head">
-                  <span className="pieza">{d.n}</span>
-                  <span className="pain-title">{d.title}</span>
-                </div>
-                <p className="pain-body">{d.body}</p>
-                <blockquote className="pain-quote">
-                  “{d.quote}”
-                  <cite>{d.cite}</cite>
-                </blockquote>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* TRANSFORMACIÓN */}
-        <section className="transform-section sec">
-          <div className="reveal">
-            <div className="sec-label">La diferencia</div>
-            <div className="sec-title">
-              De trabajar en el negocio a que el negocio{" "}
-              <span className="accent">trabaje solo</span>
-            </div>
-          </div>
-
-          <div className="compare-grid">
-            <div className="compare-col reveal d1">
-              <div className="compare-head" style={{ color: "var(--color-alert)" }}>
-                <span>✕</span> Cómo funciona hoy
-              </div>
-              {[
-                "Cada proceso depende de que alguien se acuerde de hacerlo",
-                "Nadie sabe cuánto cuesta realmente atender un pedido",
-                "Para crecer hay que contratar, con todo lo que eso implica",
-                "Los clientes que no compraron quedan en un chat, sin volver",
-                "Cuando falta la persona que sabe, se frena todo",
-              ].map((t) => (
-                <div className="compare-item" key={t}>
-                  <span className="ci-mark ci-x">✕</span>
-                  <span>{t}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="compare-col after reveal d2">
-              <div className="compare-head accent">
-                <span>✓</span> Cómo queda
-              </div>
-              {[
-                "Cada proceso corre solo, con reglas escritas y auditables",
-                "Sabés qué te cuesta cada operación y cuánto deja",
-                "El volumen sube sin que suba la nómina",
-                "Al que no compró se lo retoma sin que nadie lo recuerde",
-                "El conocimiento queda en el sistema, no en una persona",
-              ].map((t) => (
-                <div className="compare-item" key={t}>
-                  <span className="ci-mark ci-ok">✓</span>
-                  <span>{t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="honesty framed reveal d3">
-            <div className="tech" style={{ marginBottom: 14 }}>Lo que no vas a escuchar en otro lado</div>
-            <p className="honesty-text">
-              No te voy a decir que la inteligencia artificial resuelve todo. En la auditoría vas a
-              ver que hay procesos donde <strong>no conviene implementarla</strong> — porque el volumen no
-              da, porque las reglas cambian todo el tiempo, o porque simplemente sale más caro que
-              hacerlo a mano. Eso también te lo digo, y por escrito. Es la parte que nadie menciona
-              cuando lo único que tiene para venderte es un bot.
+        {/* EL PROBLEMA */}
+        <section className="seccion" id="dolor">
+          <div className="contenedor">
+            <p className="etiqueta">El problema</p>
+            <h2 className="titulo">Más pauta ya no es más ventas.</h2>
+            <p className="bajada">
+              Ponés más plata en anuncios, entran más consultas y el equipo es el mismo. Las que no se
+              contestan a tiempo se van con otro. Lo dicen los dueños con los que hablé este año:
             </p>
+            <div className="citas">
+              {DOLORES.map((d) => (
+                <figure key={d.cita} className="cita">
+                  <blockquote>“{d.cita}”</blockquote>
+                  <figcaption>{d.quien}</figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* CÓMO */}
-        <div className="how-section" id="como">
-          <div className="how-inner">
-            <div className="reveal">
-              <div className="sec-label">El proceso</div>
-              <div className="sec-title">Tres etapas, y en cada una sabés a qué atenerte</div>
-              <div className="sec-sub">
-                Nada de propuestas de veinte páginas ni de proyectos abiertos. Cada etapa tiene
-                precio, plazo y entregable definido antes de arrancar.
+        {/* LAS 3 ÁREAS */}
+        <section className="seccion stats-section">
+          <div className="contenedor">
+            <p className="etiqueta">Qué hacemos</p>
+            <h2 className="titulo">IA en las tres partes de tu negocio que mueven la plata.</h2>
+            <div className="areas">
+              {AREAS.map((a) => (
+                <div key={a.nombre} className="area">
+                  <p className="area-para">{a.para}</p>
+                  <h3>{a.nombre}</h3>
+                  <ul>
+                    {a.items.map((i) => (
+                      <li key={i}>{i}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <CalculadoraVentas calUrl={calUrl} />
+
+        {/* CÓMO TRABAJAMOS */}
+        <section className="seccion" id="como">
+          <div className="contenedor">
+            <p className="etiqueta">Cómo trabajamos</p>
+            <h2 className="titulo">Un área por vez, con un objetivo por mes.</h2>
+            <ol className="pasos">
+              {PASOS.map((p) => (
+                <li key={p.n} className="paso">
+                  <span className="paso-n">{p.n}</span>
+                  <div>
+                    <h3>{p.titulo}</h3>
+                    <p>{p.texto}</p>
+                    <span className="paso-nota">{p.nota}</span>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <div className="garantia">
+              <strong>Si el primer mes no funciona, te podés ir.</strong> Si el objetivo que acordamos
+              no se cumple, te devuelvo lo que no usaste.
+            </div>
+            <div className="centro">
+              <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton" data-cta="como">
+                Agendar una llamada
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* LO QUE YA FUNCIONA */}
+        <section className="seccion transform-section">
+          <div className="contenedor">
+            <p className="etiqueta">Lo que ya funciona</p>
+            <h2 className="titulo">No te vendo algo que no uso.</h2>
+            <p className="bajada">
+              Los agentes de IA de mis clientes atienden todos los días, y el contenido de IAbyIA, los
+              videos que te trajeron hasta acá, se produce y se publica con los mismos sistemas.
+            </p>
+            <div className="datos">
+              {FUNCIONA.map((f) => (
+                <div key={f.texto} className="dato">
+                  <strong>{f.dato}</strong>
+                  <span>{f.texto}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* PARA QUIÉN */}
+        <section className="seccion" id="diagnostico">
+          <div className="contenedor">
+            <p className="etiqueta">Para quién es</p>
+            <h2 className="titulo">Para quién es, y para quién no.</h2>
+            <div className="quien">
+              <div className="quien-col si">
+                <h3>Es para vos si</h3>
+                <ul>{SI.map((s) => <li key={s}>{s}</li>)}</ul>
+              </div>
+              <div className="quien-col no">
+                <h3>No es para vos si</h3>
+                <ul>{NO.map((s) => <li key={s}>{s}</li>)}</ul>
               </div>
             </div>
+          </div>
+        </section>
 
-            <div className="steps-grid">
-              {ETAPAS.map((s, i) => (
-                <div key={s.n} className={`step-card framed reveal d${i + 1}`}>
-                  <div className="step-num">ETAPA {s.n}</div>
-                  <div className="step-title">{s.title}</div>
-                  <div className="step-desc">{s.desc}</div>
-                  <div className="step-meta">
-                    {s.chips.map((c) => (
-                      <span key={c} className={`step-chip${s.hi ? " hi" : ""}`}>{c}</span>
-                    ))}
+        {/* PREGUNTAS */}
+        <section className="seccion" id="faq">
+          <div className="contenedor angosto">
+            <p className="etiqueta">Preguntas</p>
+            <h2 className="titulo">Lo que todos preguntan antes de arrancar.</h2>
+            <div className="faqs">
+              {FAQS.map((f, i) => (
+                <div key={f.q} className={`faq-item${abierta === i ? " open" : ""}`}>
+                  <button
+                    type="button"
+                    className="faq-btn"
+                    aria-expanded={abierta === i}
+                    aria-controls={`faq-${i}`}
+                    onClick={() => setAbierta(abierta === i ? null : i)}
+                  >
+                    {f.q}
+                    <span aria-hidden="true">{abierta === i ? "−" : "+"}</span>
+                  </button>
+                  <div className="faq-body" id={`faq-${i}`} hidden={abierta !== i}>
+                    <p>{f.a}</p>
                   </div>
                 </div>
               ))}
             </div>
-
-            <div style={{ marginTop: 52 }} className="reveal d3">
-              <div className="cota" style={{ maxWidth: 520, margin: "0 auto 26px" }}>
-                <span className="cota-val">Empieza acá</span>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 13 }}>
-                <a
-                  href={calUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary"
-                  data-cta="como"
-                >
-                  Agendar la llamada
-                  <span>→</span>
-                </a>
-                <div className="cta-note">
-                  Sin costo · Sin compromiso · Si no aplica para vos, te lo digo en la llamada
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* FAQ */}
-        <section className="faq-section" id="faq">
-          <div className="reveal">
-            <div className="sec-label">Preguntas</div>
-            <div className="sec-title" style={{ fontSize: "clamp(26px,3vw,38px)" }}>
-              Lo que todos preguntan antes de arrancar
-            </div>
-          </div>
-          <div className="faq-list reveal d1">
-            {FAQS.map((f, i) => (
-              <div key={f.q} className="faq-item">
-                <button
-                  className="faq-btn"
-                  onClick={(e) => {
-                    const item = (e.currentTarget as HTMLButtonElement).closest(".faq-item");
-                    if (!item) return;
-                    const wasOpen = item.classList.contains("open");
-                    document.querySelectorAll(".faq-item").forEach((el) => el.classList.remove("open"));
-                    if (!wasOpen) item.classList.add("open");
-                  }}
-                  type="button"
-                  aria-expanded="false"
-                  aria-controls={`faq-body-${i}`}
-                >
-                  {f.q}
-                  <span className="faq-icon">+</span>
-                </button>
-                <div className="faq-body" id={`faq-body-${i}`}>{f.a}</div>
-              </div>
-            ))}
           </div>
         </section>
 
-        {/* QUIZ (cierre) */}
-        <DiagnosticQuiz calUrl={calUrl} />
+        {/* CIERRE */}
+        <section className="cierre">
+          <div className="contenedor angosto centro">
+            <h2 className="titulo">Veamos dónde está perdiendo plata tu negocio.</h2>
+            <p className="bajada">Una llamada y un diagnóstico, gratis. Si no tiene sentido trabajar juntos, te lo digo.</p>
+            <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton" data-cta="quiz">
+              Agendar una llamada
+            </a>
+          </div>
+        </section>
       </main>
 
-      {/* FOOTER */}
       <footer>
-        <div className="footer-bottom">
-          <a href="#" className="wordmark" style={{ fontSize: 16 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/assets/logo-icon-transparent.png"
-              alt="IAbyIA"
-              width={22}
-              height={22}
-              className="wm-icon"
-              style={{ width: 22, height: 22 }}
-            />
-            <span>IAbyIA</span>
-          </a>
-          <nav className="footer-links">
-            <a href="/privacidad.html" className="footer-link">Privacidad</a>
-            <a href="/terminos.html" className="footer-link">Términos</a>
+        <div className="contenedor pie">
+          <span className="marca">IAbyIA</span>
+          <nav className="pie-links">
+            <a href="/privacidad.html">Privacidad</a>
+            <a href="/terminos.html">Términos</a>
           </nav>
-          <p className="footer-copy">© 2026 · Buenos Aires, Argentina</p>
+          <span>© 2026 · Buenos Aires, Argentina</span>
         </div>
       </footer>
+
+      {/* Botón fijo abajo, solo en celular. Usa data-cta="nav": es el mismo acceso persistente. */}
+      <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton fijo" data-cta="nav">
+        Agendar una llamada
+      </a>
     </>
   );
 }
