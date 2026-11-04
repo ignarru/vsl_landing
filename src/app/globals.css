@@ -379,3 +379,17 @@ footer { border-top: 1px solid var(--linea); padding: 32px 0 110px; font-size: 1
   html { scroll-behavior: auto; }
   .boton { transition: none; }
 }
+
+/* ── Animación del resumen (04/11): filas de a una + ✓ que aparece. Solo el panel; el título no. ── */
+.num { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: no-preference) {
+  .resumen-lista li { animation: fila-entra 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .resumen-lista li .resumen-ok { animation: check 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+  .resumen-lista li:nth-child(1), .resumen-lista li:nth-child(1) .resumen-ok { animation-delay: 0.30s; }
+  .resumen-lista li:nth-child(2), .resumen-lista li:nth-child(2) .resumen-ok { animation-delay: 0.55s; }
+  .resumen-lista li:nth-child(3), .resumen-lista li:nth-child(3) .resumen-ok { animation-delay: 0.80s; }
+  .resumen-lista li:nth-child(4), .resumen-lista li:nth-child(4) .resumen-ok { animation-delay: 1.05s; }
+  .resumen-lista li:nth-child(5), .resumen-lista li:nth-child(5) .resumen-ok { animation-delay: 1.30s; }
+}
+@keyframes fila-entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes check { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: scale(1); } }

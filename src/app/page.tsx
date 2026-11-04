@@ -69,6 +69,29 @@ function ResumenDia() {
     ["Operación", "23 pedidos actualizados", "y avisados al cliente"],
     ["Operación", "14 pagos conciliados", "contra las ventas del día"],
   ];
+
+  /* Animación chica (Ignacio, 04/11): las filas entran de a una con su ✓ (CSS, ver .resumen-lista
+     en globals.css) y "Vendido ayer" sube hasta el total. Dura ~3 s y queda quieta. El título y el
+     botón NO se animan (LCP). Con "reducir movimiento" aparece terminado. */
+  const TOTAL = 1840;
+  const [vendido, setVendido] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setVendido(TOTAL);
+      return;
+    }
+    const inicio = performance.now() + 1500; // arranca cuando ya entraron las filas
+    const dura = 1300;
+    let raf = 0;
+    const paso = (t: number) => {
+      const p = Math.min(Math.max((t - inicio) / dura, 0), 1);
+      setVendido(Math.round(TOTAL * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(paso);
+    };
+    raf = requestAnimationFrame(paso);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   return (
     <div className="resumen" aria-label="Ejemplo del resumen diario que recibe el dueño">
       <div className="resumen-cab">
@@ -92,7 +115,7 @@ function ResumenDia() {
       <div className="resumen-pie">
         <div>
           <span>Vendido ayer</span>
-          <strong>+US$ 1.840</strong>
+          <strong className="num">+US$ {vendido.toLocaleString("es-AR")}</strong>
         </div>
         <div>
           <span>Tiempo que no pusiste vos</span>
@@ -141,7 +164,7 @@ export default function Home() {
             <div className="hero-texto">
               <p className="hero-pre">Consultoría de IA para negocios online</p>
               <h1>
-                Tu negocio vende y funciona solo. <span className="gris">Vos ganás más y trabajás menos.</span>
+                Tu negocio vende y funciona solo. <span className="gris">Vos te ocupás de hacerlo crecer.</span>
               </h1>
               <p className="hero-sub">
                 Metemos IA en tus ventas y en tu operación: atención, seguimiento, pedidos, cobros y
