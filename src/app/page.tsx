@@ -214,7 +214,7 @@ export default function Home() {
             <figure className="caso">
               <p className="caso-rubro">Caso · Lubricentro · Argentina</p>
               <blockquote>
-                Le entran entre 70 y 80 WhatsApps por día. Desde octubre, el agente responde las consultas,
+                Le entran entre 70 y 80 WhatsApps por día. El agente responde las consultas,
                 cotiza con el stock del sistema y le pasa a una persona lo que necesita criterio.
               </blockquote>
             </figure>
