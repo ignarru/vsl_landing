@@ -201,7 +201,7 @@ export default function Home() {
             <div className="hero-texto">
               <p className="hero-pre">Consultoría de IA para negocios online</p>
               <h1>
-                Tu negocio vende y funciona sin que estés encima.{" "}
+                Tu negocio vende y funciona solo.{" "}
                 <span className="gris">Vos te ocupás de hacerlo crecer.</span>
               </h1>
               <p className="hero-sub">
@@ -286,7 +286,7 @@ export default function Home() {
         {/* ÁREAS: ventas y operación + el resultado para el dueño */}
         <section className="seccion stats-section">
           <div className="contenedor">
-            <h2 className="titulo">IA donde se gana y se pierde la plata.</h2>
+            <h2 className="titulo">Dónde pongo IA en tu negocio.</h2>
             <div className="areas">
               <div className="area">
                 <div className="vineta vineta-ventas" aria-hidden="true">

@@ -431,3 +431,54 @@ footer { border-top: 1px solid var(--linea); padding: 32px 0 110px; font-size: 1
   .caso-grid .datos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
   .caso-grid .dato strong { font-size: 40px; }
 }
+
+/* ── Celular v4.4 (04/11): Ignacio: "los títulos se ven chicos, no queda bien como está
+   estructurado". Los números (52 px) eran más grandes que los títulos (32 px) y todo se apilaba en
+   una columna eterna. Títulos más grandes, datos en fila, áreas deslizables y pasos compactos. ── */
+@media (max-width: 899px) {
+  .hero h1 { font-size: 46px; line-height: 1.02; }
+  .titulo { font-size: 38px; line-height: 1.06; letter-spacing: -0.035em; }
+  .titulo.grande { font-size: 44px; }
+  .bajada { font-size: 17px; margin-top: 16px; }
+  .seccion { padding: 72px 0; }
+
+  /* Datos: los tres en una fila, chicos. Ya no compiten con el título. */
+  .datos, .caso-grid .datos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 28px; }
+  .dato { padding: 16px 0 0; gap: 6px; }
+  .dato strong, .caso-grid .dato strong { font-size: 28px; }
+  .dato span { font-size: 13px; line-height: 1.4; }
+
+  /* Áreas y citas: tarjetas que se deslizan de costado (la siguiente asoma = se puede deslizar). */
+  .areas, .citas {
+    grid-auto-flow: column;
+    grid-auto-columns: 84%;
+    grid-template-columns: none;
+    gap: 14px;
+    margin: 32px -20px 0;
+    padding: 0 20px 6px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 20px;
+    scrollbar-width: none;
+    border-top: 0;
+  }
+  .areas::-webkit-scrollbar, .citas::-webkit-scrollbar { display: none; }
+  .area, .cita { scroll-snap-align: start; }
+  .area { padding: 18px; border-radius: 18px; background: var(--fondo-2); border: 1px solid var(--linea); }
+  .area .vineta { height: 132px; }
+  .area h3 { font-size: 26px; }
+  .cita { padding: 20px; border: 1px solid var(--linea); border-radius: 16px; background: var(--fondo-2); }
+  .cita blockquote { font-size: 20px; }
+
+  /* Pasos: número a la izquierda, texto a la derecha, sin aire de más. */
+  .pasos { margin-top: 32px; }
+  .paso { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 14px; padding: 20px 0; }
+  .paso-n { grid-row: 1 / span 3; margin: 4px 0 0; }
+  .paso h3 { font-size: 22px; }
+  .paso p { margin-top: 6px; }
+  .paso-nota { justify-self: start; margin-top: 10px; }
+
+  .calc-fila strong { font-size: 28px; }
+  .quien { gap: 32px; margin-top: 32px; }
+  .faq-btn { font-size: 17px; padding: 20px 0; }
+}
