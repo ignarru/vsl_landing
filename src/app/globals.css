@@ -448,24 +448,17 @@ footer { border-top: 1px solid var(--linea); padding: 32px 0 110px; font-size: 1
   .dato strong, .caso-grid .dato strong { font-size: 28px; }
   .dato span { font-size: 13px; line-height: 1.4; }
 
-  /* Áreas y citas: tarjetas que se deslizan de costado (la siguiente asoma = se puede deslizar). */
+  /* Áreas y citas: una debajo de la otra (04/11). El carrusel de costado cortaba la tarjeta
+     siguiente en el borde y se leía como un error de la página, no como algo deslizable. */
   .areas, .citas {
-    grid-auto-flow: column;
-    grid-auto-columns: 84%;
-    grid-template-columns: none;
-    gap: 14px;
-    margin: 32px -20px 0;
-    padding: 0 20px 6px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding: 0 20px;
-    scrollbar-width: none;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    margin: 28px 0 0;
+    padding: 0;
     border-top: 0;
   }
-  .areas::-webkit-scrollbar, .citas::-webkit-scrollbar { display: none; }
-  .area, .cita { scroll-snap-align: start; }
   .area { padding: 18px; border-radius: 18px; background: var(--fondo-2); border: 1px solid var(--linea); }
-  .area .vineta { height: 132px; }
+  .area .vineta { height: auto; min-height: 0; }
   .area h3 { font-size: 26px; }
   .cita { padding: 20px; border: 1px solid var(--linea); border-radius: 16px; background: var(--fondo-2); }
   .cita blockquote { font-size: 20px; }
