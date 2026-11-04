@@ -1,24 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import CalculadoraVentas from "@/components/calculadora-ventas";
 import { CAL_BASE, buildCalUrl } from "@/lib/cal-link";
 import { getSid } from "@/lib/track";
 
-/* ═══ LANDING v4.1 — oferta integral (nov 2026) ══════════════════════════════════════════
+/* ═══ LANDING v4.3 — oferta integral (nov 2026) ══════════════════════════════════════════
    Oferta: obsidian/01 - Negocio/Oferta integral — IA en marketing, ventas y operación (2026-11).md
+     (⚠ marketing quedó FUERA el 03/11: la oferta es ventas + operación)
    Investigación: obsidian/08 - Conocimiento/Landings — qué retiene y convierte (investigación nov 2026).md
+   Crítica impeccable + cro (04/11): .impeccable/critique/ — esta versión aplica todo lo que salió.
 
-   v4.1: la v4 "se veía tan simple que era fea / IA genérica". Lo que se tomó de los referentes
-   (Linear, Resend): mostrar el PRODUCTO en vez de describirlo (el chat del agente), luz y
-   atmósfera en vez de fondo plano, títulos con carácter (Instrument Serif, la de las propuestas),
-   texto en dos tonos, líneas y aire en vez de cajas, y sin rótulo chico arriba de cada título.
+   Tipografías: Instrument Sans (títulos) + Hanken Grotesk (texto), ver layout.tsx.
+   Voz: primera persona, Ignacio ("pongo", "armo"). Un negocio de una persona: el trato es el diferencial.
 
    Tracking (NO romper): selectores que mide lib/track.ts y solo los data-cta que acepta el
    dashboard (nav, hero, calculadora, como, quiz).
-     .hero · #dolor · .stats-section (3 áreas) · #calculadora · #como · .transform-section
-     #diagnostico (para quién) · #faq · footer
-   Sin animaciones de entrada: el contenido se ve al cargar (LCP). */
+     .hero · .transform-section (prueba, ahora arriba) · #dolor · .stats-section (áreas)
+     #calculadora · #como · #diagnostico (para quién) · #faq · footer
+   El título y el botón del hero no se animan (LCP). Solo se anima el resumen, cuando se ve. */
+
+/** Tu WhatsApp para el plan B al calendario, en formato internacional sin "+" (ej. "5491112345678").
+ *  Vacío = el link no aparece. ⏳ Ignacio tiene que pasarlo. */
+const WHATSAPP = "";
+const WA_TEXTO = encodeURIComponent("Hola Ignacio, vi tu página y quiero consultarte por mi negocio.");
 
 const DOLORES = [
   { cita: "La cuestión no es meter más plata en publicidad, porque ya lo hicimos. No damos abasto.", quien: "E-commerce · Uruguay" },
@@ -28,9 +33,9 @@ const DOLORES = [
 
 const PASOS = [
   { n: "01", titulo: "Llamada", texto: "Me contás cómo vende tu negocio hoy y vemos si tiene sentido trabajar juntos. Si no lo tiene, te lo digo ahí.", nota: "Gratis" },
-  { n: "02", titulo: "Diagnóstico", texto: "El mapa de tus ventas y tu operación: dónde se pierde plata y tiempo, y por dónde conviene empezar.", nota: "Gratis" },
-  { n: "03", titulo: "Un área por vez", texto: "Arrancamos por la que más pierde, con un objetivo medible por mes. Primero lo hago yo, después lo hacemos juntos y al final lo hace tu equipo.", nota: "Encuentros fijos" },
-  { n: "04", titulo: "Medición", texto: "Cada mes, un informe con tus números contra cómo estaban al empezar. Todo queda a tu nombre: cuentas, datos y sistemas.", nota: "Todos los meses" },
+  { n: "02", titulo: "Diagnóstico", texto: "Te muestro el mapa de tus ventas y tu operación: dónde se pierde plata y tiempo, y por dónde conviene empezar.", nota: "Gratis" },
+  { n: "03", titulo: "Un área por vez", texto: "Arrancamos por la que más pierde, con un objetivo medible por mes. Primero lo armo yo, después lo hacemos juntos y al final lo maneja tu equipo.", nota: "Encuentros fijos" },
+  { n: "04", titulo: "Medición", texto: "Cada mes te paso un informe con tus números contra cómo estaban al empezar. Todo queda a tu nombre: cuentas, datos y sistemas.", nota: "Todos los meses" },
 ];
 
 const SI = [
@@ -50,17 +55,22 @@ const NO = [
 const FAQS = [
   { q: "¿Cuánto cuesta?", a: "Depende de qué trabajemos primero y con qué ritmo. Lo vemos en la llamada con tus números, y el diagnóstico es gratis: sabés qué conviene hacer antes de pagar nada." },
   { q: "¿Cuánto tiempo me lleva a mí?", a: "Un encuentro fijo por semana (o dos, si querés ir más rápido) y alguien de tu equipo que le dedique unas horas. El trabajo pesado lo hago yo, sobre todo al principio." },
-  { q: "Ya lo intentamos solos y no funcionó.", a: "Es lo más común. Casi siempre falla por empezar por la herramienta y no por el problema. Acá primero se mide dónde se pierde la plata y recién después se construye, un área por vez." },
-  { q: "¿Y si la IA le responde mal a un cliente?", a: "Se prueba con consultas reales antes de salir, responde solo con la información de tu negocio y pasa la conversación a una persona cuando no sabe o cuando el cliente lo pide." },
+  { q: "Ya lo intentamos solos y no funcionó.", a: "Es lo más común. Casi siempre falla por empezar por la herramienta y no por el problema. Primero medimos dónde se pierde la plata y recién después construimos, un área por vez." },
+  { q: "¿Y si la IA le responde mal a un cliente?", a: "Lo pruebo con consultas reales antes de salir, responde solo con la información de tu negocio y le pasa la conversación a una persona cuando no sabe o cuando el cliente lo pide." },
   { q: "¿Voy a depender de vos para siempre?", a: "No. Todo queda a tu nombre: tus cuentas, tus datos, tus sistemas. Y el programa termina con tu equipo manejándolo solo. Esa es la idea." },
-  { q: "¿Y si no funciona?", a: "Si al final del primer mes el objetivo que acordamos no está funcionando, te podés ir y te devuelvo lo que no usaste." },
-  { q: "¿Me pueden bloquear el WhatsApp?", a: "Se trabaja con la API oficial de WhatsApp y respetando sus reglas, que es lo que evita los bloqueos. Si ya te pasó, lo vemos en la llamada." },
-  { q: "¿Tengo que cambiar los sistemas que uso?", a: "No. Se trabaja arriba de lo que ya tenés: tu tienda, tu WhatsApp, tus planillas, tu sistema de gestión." },
+  { q: "¿Y si no funciona?", a: "Si al final del primer mes el objetivo que acordamos no está funcionando, te podés ir y te devuelvo los meses que no usaste." },
+  { q: "¿Me pueden bloquear el WhatsApp?", a: "Trabajo con la API oficial de WhatsApp y respetando sus reglas, que es lo que evita los bloqueos. Si ya te pasó, lo vemos en la llamada." },
+  { q: "¿Tengo que cambiar los sistemas que uso?", a: "No. Trabajo arriba de lo que ya tenés: tu tienda, tu WhatsApp, tus planillas, tu sistema de gestión." },
 ];
 
-/** Todo el negocio funcionando solo: el resumen que el dueño recibe a la mañana.
- *  Ignacio (03/11): el chat solo ilustraba el agente; la oferta es TODO el negocio (ventas +
- *  operación) y el resultado es más tiempo libre y más plata. Números de EJEMPLO, rotulados así. */
+const usd = (n: number) => "US$ " + Math.round(n).toLocaleString("es-AR");
+
+/** Todo el negocio funcionando sin que el dueño esté encima: el resumen que recibe a la mañana.
+ *  Números de EJEMPLO, rotulados así. Sin montos de plata: la crítica del 04/11 marcó que
+ *  "vendido ayer US$ 1.840" contradecía a la calculadora (US$ 575 recuperable por MES).
+ *  Animación (04/11): arranca recién cuando el panel ENTRA en pantalla (en el celu queda abajo del
+ *  pliegue y antes se animaba sin que nadie la viera). Sin JS o con "reducir movimiento" se ve
+ *  terminado. */
 function ResumenDia() {
   const filas: [string, string, string][] = [
     ["Ventas", "38 consultas respondidas", "a cualquier hora"],
@@ -69,36 +79,53 @@ function ResumenDia() {
     ["Operación", "23 pedidos actualizados", "y avisados al cliente"],
     ["Operación", "14 pagos conciliados", "contra las ventas del día"],
   ];
+  const HORAS = 6;
+  const ref = useRef<HTMLDivElement>(null);
+  const [estado, setEstado] = useState<"listo" | "espera" | "anima">("listo");
+  const [horas, setHoras] = useState(HORAS);
 
-  /* Animación chica (Ignacio, 04/11): las filas entran de a una con su ✓ (CSS, ver .resumen-lista
-     en globals.css) y "Vendido ayer" sube hasta el total. Dura ~3 s y queda quieta. El título y el
-     botón NO se animan (LCP). Con "reducir movimiento" aparece terminado. */
-  const TOTAL = 1840;
-  const [vendido, setVendido] = useState(0);
+  // Antes de pintar: si hay movimiento permitido, se esconde para animarlo al verse.
+  useLayoutEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setEstado("espera");
+    setHoras(0);
+  }, []);
+
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setVendido(TOTAL);
-      return;
-    }
+    if (estado !== "espera" || !ref.current) return;
+    const io = new IntersectionObserver(
+      (e) => {
+        if (!e[0].isIntersecting) return;
+        io.disconnect();
+        setEstado("anima");
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [estado]);
+
+  useEffect(() => {
+    if (estado !== "anima") return;
     const inicio = performance.now() + 1500; // arranca cuando ya entraron las filas
-    const dura = 1300;
+    const dura = 1100;
     let raf = 0;
     const paso = (t: number) => {
       const p = Math.min(Math.max((t - inicio) / dura, 0), 1);
-      setVendido(Math.round(TOTAL * (1 - Math.pow(1 - p, 3))));
+      setHoras(Math.round(HORAS * (1 - Math.pow(1 - p, 3))));
       if (p < 1) raf = requestAnimationFrame(paso);
     };
     raf = requestAnimationFrame(paso);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [estado]);
 
   return (
-    <div className="resumen" aria-label="Ejemplo del resumen diario que recibe el dueño">
+    <div ref={ref} className={`resumen ${estado}`} aria-label="Ejemplo del resumen diario que recibe el dueño">
       <div className="resumen-cab">
         <span className="punto" />
         <div>
           <strong>Resumen de ayer</strong>
-          <span>Te llegó a las 8:00 · ejemplo</span>
+          <span>Te llega a las 8:00 · ejemplo</span>
         </div>
       </div>
       <ul className="resumen-lista">
@@ -113,14 +140,8 @@ function ResumenDia() {
         ))}
       </ul>
       <div className="resumen-pie">
-        <div>
-          <span>Vendido ayer</span>
-          <strong className="num">+US$ {vendido.toLocaleString("es-AR")}</strong>
-        </div>
-        <div>
-          <span>Tiempo que no pusiste vos</span>
-          <strong>6 h</strong>
-        </div>
+        <span>Horas que no tuviste que poner vos</span>
+        <strong className="num">{horas} h</strong>
       </div>
     </div>
   );
@@ -137,6 +158,22 @@ export default function Home() {
 
   const [abierta, setAbierta] = useState<number | null>(null);
 
+  // La pérdida que el visitante armó en la calculadora: el cierre se la devuelve.
+  const [perdida, setPerdida] = useState<number | null>(null);
+
+  // Botón fijo del celu: aparece recién cuando el botón del hero sale de pantalla (antes lo
+  // duplicaba y tapaba el resumen desde el primer segundo).
+  const ctaHero = useRef<HTMLAnchorElement>(null);
+  const [fijoVisible, setFijoVisible] = useState(false);
+  useEffect(() => {
+    if (!ctaHero.current) return;
+    const io = new IntersectionObserver((e) => setFijoVisible(!e[0].isIntersecting && e[0].boundingClientRect.top < 0));
+    io.observe(ctaHero.current);
+    return () => io.disconnect();
+  }, []);
+
+  const waUrl = WHATSAPP ? `https://wa.me/${WHATSAPP}?text=${WA_TEXTO}` : null;
+
   return (
     <>
       <nav className="nav">
@@ -147,41 +184,47 @@ export default function Home() {
             <span>IAbyIA</span>
           </a>
           <div className="nav-links">
-            <a href="#como">Cómo trabajamos</a>
+            <a href="#como">Cómo trabajo</a>
             <a href="#faq">Preguntas</a>
           </div>
           <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton boton-chico" data-cta="nav">
-            Agendar llamada
+            Diagnóstico gratis
           </a>
         </div>
       </nav>
 
       <main>
-        {/* HERO: la promesa + el producto funcionando */}
+        {/* HERO: la promesa + todo el negocio funcionando */}
         <section className="hero">
           <div className="luz" aria-hidden="true" />
           <div className="contenedor hero-grid">
             <div className="hero-texto">
               <p className="hero-pre">Consultoría de IA para negocios online</p>
               <h1>
-                Tu negocio vende y funciona solo. <span className="gris">Vos te ocupás de hacerlo crecer.</span>
+                Tu negocio vende y funciona sin que estés encima.{" "}
+                <span className="gris">Vos te ocupás de hacerlo crecer.</span>
               </h1>
               <p className="hero-sub">
-                Metemos IA en tus ventas y en tu operación: atención, seguimiento, pedidos, cobros y
-                reportes. Empezamos por donde más plata perdés hoy.
+                Pongo IA a atender tu WhatsApp e Instagram, a seguir a los que no compraron, a actualizar
+                pedidos y a conciliar cobros. Empiezo por donde más plata perdés hoy.
               </p>
               <div className="hero-acciones">
-                <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton" data-cta="hero">
-                  Agendar una llamada
+                <a ref={ctaHero} href={calUrl} target="_blank" rel="noopener noreferrer" className="boton" data-cta="hero">
+                  Quiero mi diagnóstico gratis
                 </a>
-                <span className="hero-nota">Llamada y diagnóstico gratis</span>
+                {waUrl && (
+                  <a href={waUrl} target="_blank" rel="noopener noreferrer" className="link-wa">
+                    o escribime por WhatsApp
+                  </a>
+                )}
               </div>
+              <p className="hero-nota">Hablás conmigo, Ignacio. La llamada y el diagnóstico no tienen costo.</p>
             </div>
             <ResumenDia />
           </div>
           <div className="contenedor">
             <div className="sobre">
-              <span>Funciona sobre lo que ya usás</span>
+              <span>Trabajo sobre lo que ya usás</span>
               <ul>
                 {["WhatsApp", "Instagram", "Tiendanube", "Shopify", "Mercado Libre", "Mercado Pago"].map((h) => (
                   <li key={h}>{h}</li>
@@ -191,15 +234,43 @@ export default function Home() {
           </div>
         </section>
 
-        {/* EL PROBLEMA: párrafo-titular en dos tonos + citas reales */}
+        {/* PRUEBA, arriba: la mitad de la gente no llega a la mitad de la página.
+            ⏳ [VERIFICAR] los números del caso los tiene que pasar Ignacio. */}
+        <section className="seccion transform-section">
+          <div className="contenedor caso-grid">
+            <div>
+              <h2 className="titulo">Esto ya está funcionando.</h2>
+              <p className="bajada">
+                Hay negocios donde los agentes que armé atienden a sus clientes todos los días: responden,
+                cotizan y le pasan el caso a una persona cuando hace falta.
+              </p>
+              <div className="datos">
+                <div className="dato"><strong>24/7</strong><span>atendiendo, también de noche y los fines de semana</span></div>
+                <div className="dato"><strong>~1 min</strong><span>lo que tarda en responderle a un cliente</span></div>
+                <div className="dato"><strong>100 %</strong><span>tuyo: cuentas, datos y sistemas a tu nombre</span></div>
+              </div>
+            </div>
+            <figure className="caso">
+              <p className="caso-rubro">Caso · Lubricentro · Argentina</p>
+              <blockquote>
+                Le entran entre 70 y 80 WhatsApps por día. Desde octubre, el agente responde las consultas,
+                cotiza con el stock del sistema y le pasa a una persona lo que necesita criterio.
+              </blockquote>
+              <div className="caso-numeros">
+                <div><span>Antes</span><strong className="verificar">[VERIFICAR: tiempo de respuesta]</strong></div>
+                <div><span>Ahora</span><strong className="verificar">[VERIFICAR: tiempo de respuesta]</strong></div>
+              </div>
+            </figure>
+          </div>
+        </section>
+
+        {/* EL PROBLEMA */}
         <section className="seccion" id="dolor">
           <div className="contenedor">
-            <p className="declaracion">
-              Más pauta ya no es más ventas.{" "}
-              <span className="gris">
-                Entran más consultas, el equipo es el mismo, y las que no se contestan a tiempo se van
-                con otro. Lo dicen los dueños con los que hablé este año.
-              </span>
+            <h2 className="titulo">Más pauta ya no es más ventas.</h2>
+            <p className="bajada">
+              Entran más consultas, el equipo es el mismo, y las que no se contestan a tiempo se van con
+              otro. Te lo resumo con frases que me dijeron dueños en llamadas este año:
             </p>
             <div className="citas">
               {DOLORES.map((d) => (
@@ -212,12 +283,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ÁREAS: ventas y operación (marketing quedó fuera de la oferta el 03/11) + el resultado para el dueño */}
+        {/* ÁREAS: ventas y operación + el resultado para el dueño */}
         <section className="seccion stats-section">
           <div className="contenedor">
-            <h2 className="titulo">
-              IA donde se gana y se pierde la plata. <span className="gris">Y el resultado, para vos.</span>
-            </h2>
+            <h2 className="titulo">IA donde se gana y se pierde la plata.</h2>
             <div className="areas">
               <div className="area">
                 <div className="vineta vineta-ventas" aria-hidden="true">
@@ -243,6 +312,7 @@ export default function Home() {
                   <div><span>Ventas de la semana</span><b className="ok">+18 %</b></div>
                   <div><span>Horas en el chat</span><b>−22 h</b></div>
                   <div><span>Consultas sin responder</span><b className="ok">0</b></div>
+                  <em>ejemplo</em>
                 </div>
                 <p className="area-num">03 · El resultado</p>
                 <h3>Vos</h3>
@@ -252,14 +322,12 @@ export default function Home() {
           </div>
         </section>
 
-        <CalculadoraVentas calUrl={calUrl} />
+        <CalculadoraVentas calUrl={calUrl} onCambio={setPerdida} />
 
-        {/* CÓMO TRABAJAMOS: línea de tiempo, no cajas */}
+        {/* CÓMO TRABAJO */}
         <section className="seccion" id="como">
           <div className="contenedor">
-            <h2 className="titulo">
-              Un área por vez, <span className="gris">con un objetivo por mes.</span>
-            </h2>
+            <h2 className="titulo">Un área por vez, con un objetivo por mes.</h2>
             <ol className="pasos">
               {PASOS.map((p) => (
                 <li key={p.n} className="paso">
@@ -273,29 +341,11 @@ export default function Home() {
             <div className="garantia">
               <p>
                 <strong>Si el primer mes no funciona, te podés ir.</strong> Si el objetivo que acordamos
-                no se cumple, te devuelvo lo que no usaste.
+                no se cumple, te devuelvo los meses que no usaste.
               </p>
               <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton" data-cta="como">
-                Agendar una llamada
+                Quiero mi diagnóstico gratis
               </a>
-            </div>
-          </div>
-        </section>
-
-        {/* LO QUE YA FUNCIONA */}
-        <section className="seccion transform-section">
-          <div className="contenedor">
-            <p className="declaracion">
-              Esto ya está funcionando.{" "}
-              <span className="gris">
-                Hay negocios donde los agentes que armé atienden a sus clientes todos los días: responden,
-                cotizan y le pasan el caso a una persona cuando hace falta.
-              </span>
-            </p>
-            <div className="datos">
-              <div className="dato"><strong>24/7</strong><span>agentes atendiendo a los clientes de mis clientes, también de noche y los fines de semana</span></div>
-              <div className="dato"><strong>~1 min</strong><span>lo que tarda un agente en responderle a un cliente, a cualquier hora</span></div>
-              <div className="dato"><strong>100 %</strong><span>tuyo: las cuentas, los datos y los sistemas quedan a tu nombre</span></div>
             </div>
           </div>
         </section>
@@ -303,9 +353,7 @@ export default function Home() {
         {/* PARA QUIÉN */}
         <section className="seccion" id="diagnostico">
           <div className="contenedor">
-            <h2 className="titulo">
-              Para quién es, <span className="gris">y para quién no.</span>
-            </h2>
+            <h2 className="titulo">Para quién es, y para quién no.</h2>
             <div className="quien">
               <div>
                 <h3>Es para vos si</h3>
@@ -322,7 +370,7 @@ export default function Home() {
         {/* PREGUNTAS */}
         <section className="seccion" id="faq">
           <div className="contenedor faq-grid">
-            <h2 className="titulo">Lo que todos preguntan <span className="gris">antes de arrancar.</span></h2>
+            <h2 className="titulo">Lo que todos preguntan antes de arrancar.</h2>
             <div className="faqs">
               {FAQS.map((f, i) => (
                 <div key={f.q} className={`faq-item${abierta === i ? " open" : ""}`}>
@@ -345,15 +393,26 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CIERRE */}
+        {/* CIERRE: le devuelve al visitante el número que armó en la calculadora */}
         <section className="cierre">
           <div className="luz luz-abajo" aria-hidden="true" />
           <div className="contenedor centro">
-            <h2 className="titulo grande">Veamos dónde está perdiendo plata tu negocio.</h2>
-            <p className="bajada">Una llamada y un diagnóstico, gratis. Si no tiene sentido trabajar juntos, te lo digo.</p>
-            <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton" data-cta="quiz">
-              Agendar una llamada
-            </a>
+            <h2 className="titulo grande">
+              {perdida
+                ? <>Con tus números, se te van <span className="perdida">{usd(perdida)}</span> por mes. <span className="gris">Veamos cómo recuperarlos.</span></>
+                : <>Veamos dónde está perdiendo plata tu negocio.</>}
+            </h2>
+            <p className="bajada">Una llamada conmigo y un diagnóstico, sin costo. Si no tiene sentido trabajar juntos, te lo digo.</p>
+            <div className="cierre-acciones">
+              <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton" data-cta="quiz">
+                Quiero mi diagnóstico gratis
+              </a>
+              {waUrl && (
+                <a href={waUrl} target="_blank" rel="noopener noreferrer" className="link-wa">
+                  o escribime por WhatsApp
+                </a>
+              )}
+            </div>
           </div>
         </section>
       </main>
@@ -369,9 +428,18 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Botón fijo abajo, solo en celular. Usa data-cta="nav": es el mismo acceso persistente. */}
-      <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton fijo" data-cta="nav">
-        Agendar una llamada
+      {/* Botón fijo abajo, solo en celular, recién cuando el del hero ya pasó. data-cta="nav":
+          es el mismo acceso persistente. */}
+      <a
+        href={calUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`boton fijo${fijoVisible ? " visible" : ""}`}
+        data-cta="nav"
+        aria-hidden={!fijoVisible}
+        tabIndex={fijoVisible ? 0 : -1}
+      >
+        Quiero mi diagnóstico gratis
       </a>
     </>
   );

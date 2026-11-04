@@ -19,7 +19,9 @@ function relleno(v: number, min: number, max: number) {
   return `linear-gradient(90deg, var(--acento) 0%, var(--acento) ${p}%, var(--linea) ${p}%)`;
 }
 
-export default function CalculadoraVentas({ calUrl }: { calUrl: string }) {
+/** `onCambio`: le avisa a la página la pérdida mensual cuando el visitante movió la calculadora
+ *  (no en el primer render), para que el cierre le devuelva SU número. */
+export default function CalculadoraVentas({ calUrl, onCambio }: { calUrl: string; onCambio?: (perdidaMes: number) => void }) {
   const [consultas, setConsultas] = useState(60);
   const [ticket, setTicket] = useState(50);
   const [pct, setPct] = useState(30);
@@ -33,9 +35,10 @@ export default function CalculadoraVentas({ calUrl }: { calUrl: string }) {
   const primero = useRef(true);
   useEffect(() => {
     if (primero.current) { primero.current = false; return; }
+    onCambio?.(perdidaMes);
     const t = setTimeout(() => trackCalculadora(consultas, ticket, pct, perdidaMes), 1000);
     return () => clearTimeout(t);
-  }, [consultas, ticket, pct, perdidaMes]);
+  }, [consultas, ticket, pct, perdidaMes, onCambio]);
 
   const sliders = [
     { id: "c-consultas", label: "Consultas por día (todos los canales)", v: consultas, set: setConsultas, min: 10, max: 500, step: 10, fmt: (n: number) => String(n) },
@@ -44,7 +47,7 @@ export default function CalculadoraVentas({ calUrl }: { calUrl: string }) {
   ];
 
   return (
-    <section className="seccion" id="calculadora">
+    <section className="seccion calc-banda" id="calculadora">
       <div className="contenedor calc">
         <div>
           <h2 className="titulo">

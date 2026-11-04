@@ -18,7 +18,7 @@
   --linea-2: rgba(232, 238, 247, 0.16);
   --texto: #eef2f8;
   --texto-2: #a3b0c4;
-  --texto-3: #6f7d94;
+  --texto-3: #8391a8;
   --acento: #2aadd8;
   --acento-hover: #4cc2e8;
   --azul: #0d4ea3;
@@ -111,7 +111,9 @@ a { color: inherit; }
 .hero h1 { font-size: clamp(40px, 5.6vw, 68px); line-height: 1.04; }
 .hero-sub { margin: 26px 0 0; max-width: 520px; font-size: 19px; color: var(--texto-2); }
 .hero-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 34px; }
-.hero-nota { font-size: 15px; color: var(--texto-3); }
+.hero-nota { margin: 18px 0 0; font-size: 15px; color: var(--texto-2); }
+.link-wa { font-size: 15px; font-weight: 600; color: var(--texto); text-underline-offset: 4px; }
+.link-wa:hover { color: var(--acento); }
 
 /* El producto: chat del agente */
 .chat {
@@ -238,12 +240,9 @@ a { color: inherit; }
 .resumen-area { font-size: 12.5px; color: var(--texto-3); }
 .resumen-que strong { color: var(--texto); font-weight: 600; }
 .resumen-ok { color: var(--ok); font-weight: 700; }
-.resumen-pie { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--linea-2); background: rgba(98, 214, 168, 0.05); }
-.resumen-pie div { display: grid; gap: 4px; padding: 16px 20px; }
-.resumen-pie div + div { border-left: 1px solid var(--linea); }
-.resumen-pie span { font-size: 13px; color: var(--texto-2); }
+.resumen-pie { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 20px; border-top: 1px solid var(--linea-2); background: rgba(98, 214, 168, 0.05); }
+.resumen-pie span { font-size: 14px; color: var(--texto-2); }
 .resumen-pie strong { font-family: var(--titulos); font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: var(--ok); }
-.resumen-pie div + div strong { color: var(--texto); }
 
 /* Calculadora */
 .calc { display: grid; gap: 48px; grid-template-columns: minmax(0, 1fr); align-items: start; }
@@ -254,11 +253,11 @@ a { color: inherit; }
 .slider input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 4px; outline: none; }
 .slider input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
-  width: 22px; height: 22px; border-radius: 50%;
+  width: 28px; height: 28px; border-radius: 50%;
   background: var(--texto); border: 0; cursor: pointer;
 }
 .slider input[type="range"]::-moz-range-thumb {
-  width: 22px; height: 22px; border-radius: 50%;
+  width: 28px; height: 28px; border-radius: 50%;
   background: var(--texto); border: 0; cursor: pointer;
 }
 .calc-resultado {
@@ -305,7 +304,7 @@ a { color: inherit; }
 .quien { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; margin-top: 64px; }
 .quien h3 { font-size: 18px; margin-bottom: 8px; }
 .lista { margin: 0; padding: 0; list-style: none; }
-.lista li { position: relative; padding: 16px 0 16px 34px; border-bottom: 1px solid var(--linea); color: var(--texto-2); }
+.lista li { text-wrap: pretty; position: relative; padding: 16px 0 16px 34px; border-bottom: 1px solid var(--linea); color: var(--texto-2); }
 .lista li::before { position: absolute; left: 0; top: 16px; font-weight: 700; }
 .lista.si li::before { content: "✓"; color: var(--ok); }
 .lista.no li::before { content: "✕"; color: var(--texto-3); }
@@ -338,7 +337,8 @@ footer { border-top: 1px solid var(--linea); padding: 32px 0 110px; font-size: 1
 .pie-links a:hover { color: var(--texto); }
 
 /* Botón fijo abajo: solo en celular */
-.fijo { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 30; }
+.fijo { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 30; opacity: 0; transform: translateY(120%); pointer-events: none; transition: opacity 0.25s ease, transform 0.25s ease; }
+.fijo.visible { opacity: 1; transform: none; pointer-events: auto; }
 
 /* ── Compu ──────────────────────────────────────────────────── */
 @media (min-width: 900px) {
@@ -383,8 +383,9 @@ footer { border-top: 1px solid var(--linea); padding: 32px 0 110px; font-size: 1
 /* ── Animación del resumen (04/11): filas de a una + ✓ que aparece. Solo el panel; el título no. ── */
 .num { font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: no-preference) {
-  .resumen-lista li { animation: fila-entra 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-  .resumen-lista li .resumen-ok { animation: check 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+  .resumen.espera .resumen-lista li { opacity: 0; }
+  .resumen.anima .resumen-lista li { animation: fila-entra 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .resumen.anima .resumen-lista li .resumen-ok { animation: check 0.35s cubic-bezier(0.25, 1, 0.5, 1) both; }
   .resumen-lista li:nth-child(1), .resumen-lista li:nth-child(1) .resumen-ok { animation-delay: 0.30s; }
   .resumen-lista li:nth-child(2), .resumen-lista li:nth-child(2) .resumen-ok { animation-delay: 0.55s; }
   .resumen-lista li:nth-child(3), .resumen-lista li:nth-child(3) .resumen-ok { animation-delay: 0.80s; }
@@ -393,3 +394,40 @@ footer { border-top: 1px solid var(--linea); padding: 32px 0 110px; font-size: 1
 }
 @keyframes fila-entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes check { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: scale(1); } }
+
+/* ── v4.3 (04/11): lo que salió de la crítica impeccable + cro ── */
+/* La calculadora es el pico: franja propia de lado a lado, rompe el ritmo de secciones iguales. */
+.calc-banda { background: var(--fondo-2); border-top: 1px solid var(--linea-2); border-bottom: 1px solid var(--linea-2); }
+.calc-banda + .seccion { border-top: 0; }
+
+/* La prueba sube debajo del hero: caso concreto al lado de los datos. */
+.transform-section { padding-top: 88px; }
+.caso-grid { display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+.caso-grid .datos { margin-top: 40px; }
+.caso {
+  margin: 0;
+  padding: 28px;
+  border-radius: 22px;
+  background: var(--fondo-3);
+  border: 1px solid var(--linea-2);
+}
+.caso-rubro { margin: 0 0 14px; font-size: 14px; font-weight: 600; color: var(--acento); }
+.caso blockquote { margin: 0; font-size: 19px; line-height: 1.5; color: var(--texto); }
+.caso-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--linea); }
+.caso-numeros div { display: grid; gap: 6px; }
+.caso-numeros span { font-size: 13px; color: var(--texto-2); }
+.caso-numeros strong { font-family: var(--titulos); font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+/* Marca de dato que falta confirmar: solo para el borrador local, nunca para publicar. */
+.verificar { font-size: 14px !important; font-family: var(--cuerpo) !important; color: #f0b429 !important; border: 1px dashed rgba(240, 180, 41, 0.6); border-radius: 6px; padding: 4px 8px; }
+
+.vineta-vos em { display: block; margin-top: 6px; font-style: normal; font-size: 12px; color: var(--texto-3); text-align: right; }
+
+.titulo .perdida { color: var(--perdida); white-space: nowrap; }
+.cierre-acciones { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px 22px; margin-top: 36px; }
+.cierre-acciones .boton { margin-top: 0; }
+
+@media (min-width: 900px) {
+  .caso-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 64px; }
+  .caso-grid .datos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .caso-grid .dato strong { font-size: 40px; }
+}
