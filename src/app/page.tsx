@@ -28,7 +28,7 @@ const DOLORES = [
 
 const PASOS = [
   { n: "01", titulo: "Llamada", texto: "Me contás cómo vende tu negocio hoy y vemos si tiene sentido trabajar juntos. Si no lo tiene, te lo digo ahí.", nota: "Gratis" },
-  { n: "02", titulo: "Diagnóstico", texto: "El mapa de tu marketing, tus ventas y tu operación: dónde se pierde plata en cada una y por cuál conviene empezar.", nota: "Gratis" },
+  { n: "02", titulo: "Diagnóstico", texto: "El mapa de tus ventas y tu operación: dónde se pierde plata y tiempo, y por dónde conviene empezar.", nota: "Gratis" },
   { n: "03", titulo: "Un área por vez", texto: "Arrancamos por la que más pierde, con un objetivo medible por mes. Primero lo hago yo, después lo hacemos juntos y al final lo hace tu equipo.", nota: "Encuentros fijos" },
   { n: "04", titulo: "Medición", texto: "Cada mes, un informe con tus números contra cómo estaban al empezar. Todo queda a tu nombre: cuentas, datos y sistemas.", nota: "Todos los meses" },
 ];
@@ -48,7 +48,7 @@ const NO = [
 ];
 
 const FAQS = [
-  { q: "¿Cuánto cuesta?", a: "Depende de cuántas áreas trabajemos y con qué ritmo. Lo vemos en la llamada con tus números, y el diagnóstico es gratis: sabés qué conviene hacer antes de pagar nada." },
+  { q: "¿Cuánto cuesta?", a: "Depende de qué trabajemos primero y con qué ritmo. Lo vemos en la llamada con tus números, y el diagnóstico es gratis: sabés qué conviene hacer antes de pagar nada." },
   { q: "¿Cuánto tiempo me lleva a mí?", a: "Un encuentro fijo por semana (o dos, si querés ir más rápido) y alguien de tu equipo que le dedique unas horas. El trabajo pesado lo hago yo, sobre todo al principio." },
   { q: "Ya lo intentamos solos y no funcionó.", a: "Es lo más común. Casi siempre falla por empezar por la herramienta y no por el problema. Acá primero se mide dónde se pierde la plata y recién después se construye, un área por vez." },
   { q: "¿Y si la IA le responde mal a un cliente?", a: "Se prueba con consultas reales antes de salir, responde solo con la información de tu negocio y pasa la conversación a una persona cuando no sabe o cuando el cliente lo pide." },
@@ -58,29 +58,46 @@ const FAQS = [
   { q: "¿Tengo que cambiar los sistemas que uso?", a: "No. Se trabaja arriba de lo que ya tenés: tu tienda, tu WhatsApp, tus planillas, tu sistema de gestión." },
 ];
 
-/** El producto, mostrado: un agente atendiendo a un cliente fuera de horario.
- *  Conversación de ejemplo (rubro indumentaria), sin datos de ningún cliente real. */
-function ChatAgente() {
+/** Todo el negocio funcionando solo: el resumen que el dueño recibe a la mañana.
+ *  Ignacio (03/11): el chat solo ilustraba el agente; la oferta es TODO el negocio (ventas +
+ *  operación) y el resultado es más tiempo libre y más plata. Números de EJEMPLO, rotulados así. */
+function ResumenDia() {
+  const filas: [string, string, string][] = [
+    ["Ventas", "38 consultas respondidas", "a cualquier hora"],
+    ["Ventas", "9 ventas cerradas", "sin que nadie toque el chat"],
+    ["Ventas", "12 clientes retomados", "de los que no habían comprado"],
+    ["Operación", "23 pedidos actualizados", "y avisados al cliente"],
+    ["Operación", "14 pagos conciliados", "contra las ventas del día"],
+  ];
   return (
-    <div className="chat" aria-label="Ejemplo: un agente de IA atiende una consulta por WhatsApp a las 23:47">
-      <div className="chat-cab">
-        <span className="chat-avatar">T</span>
+    <div className="resumen" aria-label="Ejemplo del resumen diario que recibe el dueño">
+      <div className="resumen-cab">
+        <span className="punto" />
         <div>
-          <strong>Tu tienda</strong>
-          <span>en línea · responde el agente de IA</span>
+          <strong>Resumen de ayer</strong>
+          <span>Te llegó a las 8:00 · ejemplo</span>
         </div>
       </div>
-      <div className="chat-cuerpo">
-        <p className="chat-dia">Hoy</p>
-        <div className="msj cliente">Hola! tienen la campera negra en talle M? <i>23:47</i></div>
-        <div className="msj agente">¡Hola! Sí, quedan 3 en talle M. Sale US$ 64 y con transferencia tenés 10 % off. ¿Te la reservo? <i>23:47</i></div>
-        <div className="msj cliente">dale, y llega a Córdoba? <i>23:48</i></div>
-        <div className="msj agente">Sí, llega en 48 a 72 h hábiles. Te paso el link de pago con la reserva hecha 👇 <i>23:48</i></div>
-        <div className="msj agente link">tutienda.com/pago/M-negra <i>23:48</i></div>
-        <div className="msj cliente">listo, pagado 🙌 <i>23:51</i></div>
-      </div>
-      <div className="chat-pie">
-        <span className="punto" /> Venta cerrada mientras el equipo dormía
+      <ul className="resumen-lista">
+        {filas.map(([area, que, detalle]) => (
+          <li key={que}>
+            <span className="resumen-area">{area}</span>
+            <span className="resumen-que">
+              <strong>{que}</strong> {detalle}
+            </span>
+            <span className="resumen-ok" aria-hidden="true">✓</span>
+          </li>
+        ))}
+      </ul>
+      <div className="resumen-pie">
+        <div>
+          <span>Vendido ayer</span>
+          <strong>+US$ 1.840</strong>
+        </div>
+        <div>
+          <span>Tiempo que no pusiste vos</span>
+          <strong>6 h</strong>
+        </div>
       </div>
     </div>
   );
@@ -124,11 +141,11 @@ export default function Home() {
             <div className="hero-texto">
               <p className="hero-pre">Consultoría de IA para negocios online</p>
               <h1>
-                Vendé más con la misma pauta <span className="gris">y el mismo equipo.</span>
+                Tu negocio vende y funciona solo. <span className="gris">Vos ganás más y trabajás menos.</span>
               </h1>
               <p className="hero-sub">
-                Metemos IA en tu marketing, tus ventas y tu operación. Empezamos por donde más plata
-                perdés hoy, y sumamos un área por vez.
+                Metemos IA en tus ventas y en tu operación: atención, seguimiento, pedidos, cobros y
+                reportes. Empezamos por donde más plata perdés hoy.
               </p>
               <div className="hero-acciones">
                 <a href={calUrl} target="_blank" rel="noopener noreferrer" className="boton" data-cta="hero">
@@ -137,13 +154,13 @@ export default function Home() {
                 <span className="hero-nota">Llamada y diagnóstico gratis</span>
               </div>
             </div>
-            <ChatAgente />
+            <ResumenDia />
           </div>
           <div className="contenedor">
             <div className="sobre">
               <span>Funciona sobre lo que ya usás</span>
               <ul>
-                {["WhatsApp", "Instagram", "Tiendanube", "Shopify", "Mercado Libre", "Meta Ads"].map((h) => (
+                {["WhatsApp", "Instagram", "Tiendanube", "Shopify", "Mercado Libre", "Mercado Pago"].map((h) => (
                   <li key={h}>{h}</li>
                 ))}
               </ul>
@@ -172,30 +189,21 @@ export default function Home() {
           </div>
         </section>
 
-        {/* LAS 3 ÁREAS: cada una con una viñeta del producto */}
+        {/* ÁREAS: ventas y operación (marketing quedó fuera de la oferta el 03/11) + el resultado para el dueño */}
         <section className="seccion stats-section">
           <div className="contenedor">
             <h2 className="titulo">
-              IA en las tres partes del negocio <span className="gris">que mueven la plata.</span>
+              IA donde se gana y se pierde la plata. <span className="gris">Y el resultado, para vos.</span>
             </h2>
             <div className="areas">
-              <div className="area">
-                <div className="vineta vineta-mkt" aria-hidden="true">
-                  <span /><span /><span />
-                  <em>3 creatividades nuevas · hoy</em>
-                </div>
-                <p className="area-num">01 · Atraer</p>
-                <h3>Marketing</h3>
-                <p>Creatividades y fotos de producto con IA, guiones para anuncios y reels, publicación automática, y saber qué anuncio trae ventas.</p>
-              </div>
               <div className="area">
                 <div className="vineta vineta-ventas" aria-hidden="true">
                   <div className="mini-msj">¿Hacen envíos a Rosario?</div>
                   <div className="mini-msj agente">Sí, llega en 48 h. ¿Te paso el link?</div>
                 </div>
-                <p className="area-num">02 · Convertir</p>
+                <p className="area-num">01 · Vender</p>
                 <h3>Ventas</h3>
-                <p>Respuesta en un minuto en WhatsApp, Instagram y la web, seguimiento de lo que no se cerró, reparto de leads y recompra.</p>
+                <p>Respuesta en un minuto en WhatsApp, Instagram y la web, seguimiento de lo que no se cerró, reparto de consultas y recompra.</p>
               </div>
               <div className="area">
                 <div className="vineta vineta-op" aria-hidden="true">
@@ -203,9 +211,19 @@ export default function Home() {
                   <div><span>#1044</span><b>En camino</b></div>
                   <div><span>#1045</span><b className="ok">Pagado</b></div>
                 </div>
-                <p className="area-num">03 · Entregar y cobrar</p>
+                <p className="area-num">02 · Entregar y cobrar</p>
                 <h3>Operación</h3>
-                <p>Estado de pedidos y envíos, stock en un solo lugar, pagos conciliados solos y un reporte diario de ventas y pauta.</p>
+                <p>Estado de pedidos y envíos, stock en un solo lugar, pagos conciliados solos y las tareas repetitivas del equipo.</p>
+              </div>
+              <div className="area">
+                <div className="vineta vineta-vos" aria-hidden="true">
+                  <div><span>Ventas de la semana</span><b className="ok">+18 %</b></div>
+                  <div><span>Horas en el chat</span><b>−22 h</b></div>
+                  <div><span>Consultas sin responder</span><b className="ok">0</b></div>
+                </div>
+                <p className="area-num">03 · El resultado</p>
+                <h3>Vos</h3>
+                <p>Menos horas apagando incendios, un reporte cada mañana y decisiones con números, no a ojo. Más tiempo para hacer crecer el negocio.</p>
               </div>
             </div>
           </div>
@@ -245,16 +263,16 @@ export default function Home() {
         <section className="seccion transform-section">
           <div className="contenedor">
             <p className="declaracion">
-              No te vendo algo que no uso.{" "}
+              Esto ya está funcionando.{" "}
               <span className="gris">
-                Los agentes de mis clientes atienden todos los días, y el contenido de IAbyIA, los videos
-                que te trajeron hasta acá, se produce y se publica con los mismos sistemas.
+                Hay negocios donde los agentes que armé atienden a sus clientes todos los días: responden,
+                cotizan y le pasan el caso a una persona cuando hace falta.
               </span>
             </p>
             <div className="datos">
               <div className="dato"><strong>24/7</strong><span>agentes atendiendo a los clientes de mis clientes, también de noche y los fines de semana</span></div>
               <div className="dato"><strong>~1 min</strong><span>lo que tarda un agente en responderle a un cliente, a cualquier hora</span></div>
-              <div className="dato"><strong>3 áreas</strong><span>donde ya lo aplico en IAbyIA: el contenido, la atención y la operación</span></div>
+              <div className="dato"><strong>100 %</strong><span>tuyo: las cuentas, los datos y los sistemas quedan a tu nombre</span></div>
             </div>
           </div>
         </section>

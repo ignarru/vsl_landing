@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Instrument_Serif } from "next/font/google";
+import { Hanken_Grotesk, Instrument_Sans } from "next/font/google";
 import Script from "next/script";
 import Tracker from "@/components/tracker";
 import { CTA_BOOT } from "@/lib/cta-boot";
@@ -7,9 +7,10 @@ import "./globals.css";
 
 /* v4 (nov 2026): estética oscura y simple. Fuentes self-hosted por next/font: sin la hoja de
    Google Fonts bloqueando el render (en v2 el LCP en celular era de 6,3 s). */
-// Instrument Serif: la misma de los títulos de las propuestas → la marca se ve igual en todo el embudo.
-const titulos = Instrument_Serif({ variable: "--font-titulos", subsets: ["latin"], weight: "400", display: "swap" });
-const cuerpo = DM_Sans({ variable: "--font-cuerpo", subsets: ["latin"], display: "swap" });
+// Ignacio (03/11): la serif "no me gusta tanto, quiero algo que se lea fácil". Dos sans legibles:
+// Instrument Sans para títulos (algo de carácter) y Hanken Grotesk para el texto.
+const titulos = Instrument_Sans({ variable: "--font-titulos", subsets: ["latin"], weight: ["500", "600", "700"], display: "swap" });
+const cuerpo = Hanken_Grotesk({ variable: "--font-cuerpo", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "IAbyIA — IA para vender más en tu negocio online",
