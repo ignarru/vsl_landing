@@ -34,7 +34,7 @@ const PASOS = [
 ];
 
 const SI = [
-  "Tenés un negocio online que factura más de USD 30.000 por mes",
+  "Tenés un negocio online que ya vende todos los días",
   "Ponés plata en pauta y entran más consultas de las que tu equipo contesta",
   "Decidís vos, o tus socios están en la llamada",
   "Querés que tu equipo aprenda a usarlo, no depender de alguien para siempre",
@@ -53,7 +53,7 @@ const FAQS = [
   { q: "Ya lo intentamos solos y no funcionó.", a: "Es lo más común. Casi siempre falla por empezar por la herramienta y no por el problema. Acá primero se mide dónde se pierde la plata y recién después se construye, un área por vez." },
   { q: "¿Y si la IA le responde mal a un cliente?", a: "Se prueba con consultas reales antes de salir, responde solo con la información de tu negocio y pasa la conversación a una persona cuando no sabe o cuando el cliente lo pide." },
   { q: "¿Voy a depender de vos para siempre?", a: "No. Todo queda a tu nombre: tus cuentas, tus datos, tus sistemas. Y el programa termina con tu equipo manejándolo solo. Esa es la idea." },
-  { q: "¿Y si no funciona?", a: "Si al final del primer mes el objetivo que acordamos no está funcionando, te podés ir y te devuelvo lo que no usaste. La única condición es que hayamos hecho los encuentros." },
+  { q: "¿Y si no funciona?", a: "Si al final del primer mes el objetivo que acordamos no está funcionando, te podés ir y te devuelvo lo que no usaste." },
   { q: "¿Me pueden bloquear el WhatsApp?", a: "Se trabaja con la API oficial de WhatsApp y respetando sus reglas, que es lo que evita los bloqueos. Si ya te pasó, lo vemos en la llamada." },
   { q: "¿Tengo que cambiar los sistemas que uso?", a: "No. Se trabaja arriba de lo que ya tenés: tu tienda, tu WhatsApp, tus planillas, tu sistema de gestión." },
 ];
