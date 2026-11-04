@@ -482,3 +482,15 @@ footer { border-top: 1px solid var(--linea); padding: 32px 0 110px; font-size: 1
   .quien { gap: 32px; margin-top: 32px; }
   .faq-btn { font-size: 17px; padding: 20px 0; }
 }
+
+/* Celu (04/11): "el título se ve más chico que el subtítulo". Más contraste de tamaños: título del
+   hero grande y que crece con la pantalla; texto de apoyo y títulos de sección un escalón abajo. */
+@media (max-width: 899px) {
+  .hero h1 { font-size: clamp(50px, 13vw, 72px); line-height: 0.98; letter-spacing: -0.045em; }
+  .hero-sub { font-size: 17px; margin-top: 20px; }
+  .titulo { font-size: clamp(32px, 8.6vw, 44px); }
+}
+@media (max-width: 899px) {
+  .luz { inset: -10% 0 auto; }
+  .luz-abajo { inset: auto 0 -40%; }
+}
