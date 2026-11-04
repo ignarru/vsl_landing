@@ -383,7 +383,7 @@ footer { border-top: 1px solid var(--linea); padding: 32px 0 110px; font-size: 1
 /* ── Animación del resumen (04/11): filas de a una + ✓ que aparece. Solo el panel; el título no. ── */
 .num { font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: no-preference) {
-  .resumen.espera .resumen-lista li { opacity: 0; }
+
   .resumen.anima .resumen-lista li { animation: fila-entra 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
   .resumen.anima .resumen-lista li .resumen-ok { animation: check 0.35s cubic-bezier(0.25, 1, 0.5, 1) both; }
   .resumen-lista li:nth-child(1), .resumen-lista li:nth-child(1) .resumen-ok { animation-delay: 0.30s; }

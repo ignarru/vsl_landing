@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CalculadoraVentas from "@/components/calculadora-ventas";
 import { CAL_BASE, buildCalUrl } from "@/lib/cal-link";
 import { getSid } from "@/lib/track";
@@ -68,9 +68,8 @@ const usd = (n: number) => "US$ " + Math.round(n).toLocaleString("es-AR");
 /** Todo el negocio funcionando sin que el dueño esté encima: el resumen que recibe a la mañana.
  *  Números de EJEMPLO, rotulados así. Sin montos de plata: la crítica del 04/11 marcó que
  *  "vendido ayer US$ 1.840" contradecía a la calculadora (US$ 575 recuperable por MES).
- *  Animación (04/11): arranca recién cuando el panel ENTRA en pantalla (en el celu queda abajo del
- *  pliegue y antes se animaba sin que nadie la viera). Sin JS o con "reducir movimiento" se ve
- *  terminado. */
+ *  SIN animación (Ignacio, 04/11: "es muy mala, y en mobile ni se ve"): el resumen quieto cuenta
+ *  lo mismo y carga más rápido. */
 function ResumenDia() {
   const filas: [string, string, string][] = [
     ["Ventas", "38 consultas respondidas", "a cualquier hora"],
@@ -79,48 +78,8 @@ function ResumenDia() {
     ["Operación", "23 pedidos actualizados", "y avisados al cliente"],
     ["Operación", "14 pagos conciliados", "contra las ventas del día"],
   ];
-  const HORAS = 6;
-  const ref = useRef<HTMLDivElement>(null);
-  const [estado, setEstado] = useState<"listo" | "espera" | "anima">("listo");
-  const [horas, setHoras] = useState(HORAS);
-
-  // Antes de pintar: si hay movimiento permitido, se esconde para animarlo al verse.
-  useLayoutEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setEstado("espera");
-    setHoras(0);
-  }, []);
-
-  useEffect(() => {
-    if (estado !== "espera" || !ref.current) return;
-    const io = new IntersectionObserver(
-      (e) => {
-        if (!e[0].isIntersecting) return;
-        io.disconnect();
-        setEstado("anima");
-      },
-      { threshold: 0.35 },
-    );
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, [estado]);
-
-  useEffect(() => {
-    if (estado !== "anima") return;
-    const inicio = performance.now() + 1500; // arranca cuando ya entraron las filas
-    const dura = 1100;
-    let raf = 0;
-    const paso = (t: number) => {
-      const p = Math.min(Math.max((t - inicio) / dura, 0), 1);
-      setHoras(Math.round(HORAS * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) raf = requestAnimationFrame(paso);
-    };
-    raf = requestAnimationFrame(paso);
-    return () => cancelAnimationFrame(raf);
-  }, [estado]);
-
   return (
-    <div ref={ref} className={`resumen ${estado}`} aria-label="Ejemplo del resumen diario que recibe el dueño">
+    <div className="resumen" aria-label="Ejemplo del resumen diario que recibe el dueño">
       <div className="resumen-cab">
         <span className="punto" />
         <div>
@@ -141,7 +100,7 @@ function ResumenDia() {
       </ul>
       <div className="resumen-pie">
         <span>Horas que no tuviste que poner vos</span>
-        <strong className="num">{horas} h</strong>
+        <strong className="num">6 h</strong>
       </div>
     </div>
   );
