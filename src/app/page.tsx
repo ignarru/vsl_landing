@@ -201,8 +201,9 @@ export default function Home() {
             <div className="hero-texto">
               <p className="hero-pre">Consultoría de IA para negocios online</p>
               <h1>
-                Tu negocio vende y funciona solo.{" "}
-                <span className="gris">Vos te ocupás de hacerlo crecer.</span>
+                {/* "funciona solo." nunca se parte (Ignacio, 04/11); la segunda frase arranca en su renglón. */}
+                Tu negocio vende y <span className="junto">funciona solo.</span>{" "}
+                <span className="gris bloque">Vos te ocupás de hacerlo crecer.</span>
               </h1>
               <p className="hero-sub">
                 Pongo IA a atender tu WhatsApp e Instagram, a seguir a los que no compraron, a actualizar

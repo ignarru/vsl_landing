@@ -494,3 +494,12 @@ footer { border-top: 1px solid var(--linea); padding: 32px 0 110px; font-size: 1
   .luz { inset: -10% 0 auto; }
   .luz-abajo { inset: auto 0 -40%; }
 }
+
+/* Título del hero: "funciona solo." en un solo renglón y la frase gris abajo. En celu el tamaño
+   se calcula para que "funciona solo." entre en el ancho (≈ 7,1 caracteres por em de pantalla). */
+.junto { white-space: nowrap; }
+.hero h1 .junto { display: block; }
+.hero h1 .bloque { display: block; }
+@media (max-width: 899px) {
+  .hero h1 { font-size: clamp(40px, 12.2vw, 68px); }
+}
