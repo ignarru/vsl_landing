@@ -47,8 +47,9 @@ export default function CalculadoraVentas({ calUrl }: { calUrl: string }) {
     <section className="seccion" id="calculadora">
       <div className="contenedor calc">
         <div>
-          <p className="etiqueta">Hacé la cuenta</p>
-          <h2 className="titulo">¿Cuánto te cuestan las consultas que no se contestan a tiempo?</h2>
+          <h2 className="titulo">
+            ¿Cuánto te cuestan las consultas <span className="gris">que no se contestan a tiempo?</span>
+          </h2>
           <p className="bajada">Movelo con tus números. Es una estimación conservadora y solo cuenta ventas: no incluye lo que se gana en marketing ni las horas que se liberan en operación.</p>
 
           <div className="sliders">

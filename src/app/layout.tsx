@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Space_Grotesk } from "next/font/google";
+import { DM_Sans, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
 import Tracker from "@/components/tracker";
 import { CTA_BOOT } from "@/lib/cta-boot";
@@ -7,7 +7,8 @@ import "./globals.css";
 
 /* v4 (nov 2026): estética oscura y simple. Fuentes self-hosted por next/font: sin la hoja de
    Google Fonts bloqueando el render (en v2 el LCP en celular era de 6,3 s). */
-const titulos = Space_Grotesk({ variable: "--font-titulos", subsets: ["latin"], weight: ["500", "700"], display: "swap" });
+// Instrument Serif: la misma de los títulos de las propuestas → la marca se ve igual en todo el embudo.
+const titulos = Instrument_Serif({ variable: "--font-titulos", subsets: ["latin"], weight: "400", display: "swap" });
 const cuerpo = DM_Sans({ variable: "--font-cuerpo", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
@@ -40,7 +41,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    // Las variables de fuente van en <html>: globals.css las lee desde :root (--titulos/--cuerpo).
+    // En <body> quedaban sin definir en :root y los títulos caían a la letra por defecto.
+    <html lang="es" className={`${titulos.variable} ${cuerpo.variable}`}>
       <head>
         {/* ⚡ Primero de todo: completa los links a cal.com (utm + lp_sid) sin esperar a que
             hidrate React. El HTML estático los sirve pelados y un clic temprano perdía la
@@ -61,7 +64,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${titulos.variable} ${cuerpo.variable} antialiased`}>
+      <body className="antialiased">
         {children}
         {/* Tracking propio → dashboard.iabyia.com.ar. Es el único que puede unir una visita con
             la reunión y la venta que generó; GA4 (arriba) queda para el tráfico general. */}
